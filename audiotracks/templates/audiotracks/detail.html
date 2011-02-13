@@ -14,17 +14,15 @@
      {{ track.genre }} 
   </h3>
   <div>
-    <!--
-    <audio src="{{ track.audiofile.url }}" controls="controls">
+    <audio src="{{ track.audio_file.url }}" controls="controls">
     Your browser does not support the audio element.
     </audio>
-    -->
   </div>
   <div class="audiotracks-description">
     {{ track.description }}
   </div>
   <div class="audiotracks-download">
-    <a href="{{ track.audiofile.url }}">{% trans 'Download Track' %}</a>
+    <a href="{{ track.audio_file.url }}">{% trans 'Download Track' %}</a>
   </div>
 </div>
 {% endblock %}
