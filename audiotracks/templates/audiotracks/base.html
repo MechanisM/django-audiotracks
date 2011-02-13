@@ -1,30 +1,31 @@
-{% extends "site_base.html" %}
-{% comment %}
-This template is copied from the base templates to provide the friends
-photos link which is specific to social_project.
+{% load i18n %} 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/style.css" media="screen">
+    <link rel="stylesheet" href="/media/static/audiotracks/css/screen.css">
+  </head>
+  <body>
 
-NOTE: we don't extend that since it would extend itself and Django will
-crash.
-{% endcomment %}
+  {% block subnav %}
+      {% if user.is_authenticated %}
+          <ul>
+            <li><a href="{% url audiotracks user.username %}">{% trans 'Latest tracks' %}</a></li>
+            <li><a href="{% url user_index user.username %}">{% trans 'Your tracks' %}</a></li>
+            <li><a href="{% url upload_track user.username %}">{% trans 'Upload track' %}</a></li>
+          </ul>
+      {% else %}
+          &nbsp;
+      {% endif %}
+  {% endblock %}
 
-{% load i18n %}
-{% load group_tags %}
+  {% block body %}
+  {% endblock %}
+  </body>
+</html>
 
-{% block extra_head %}<link rel="stylesheet" href="/media/static/audiotracks/css/screen.css" />{% endblock %}
 
-{% block body_class %}audiotracks{% endblock %}
 
-{% block subnav %}
-    {% if user.is_authenticated %}
-        <ul>
-          <li><a href="{% url audiotracks user.username %}">{% trans 'Latest tracks' %}</a></li>
-          <li><a href="{% url user_index user.username %}">{% trans 'Your tracks' %}</a></li>
-          <li><a href="{% url upload_track user.username %}">{% trans 'Upload track' %}</a></li>
-        </ul>
-    {% else %}
-        &nbsp;
-    {% endif %}
-{% endblock %}
 
-{% block body %}
-{% endblock %}

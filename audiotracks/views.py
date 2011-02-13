@@ -52,7 +52,7 @@ def upload_track(request, username):
             track = form.save(commit=False)
             track.user = request.user
             for field in ('title', 'artist', 'genre', 'description', 'date'):
-                if metadata.get(field):
+                if metadata and metadata.get(field):
                     setattr(track, field, metadata.get(field)[0])
             track.save()
             return HttpResponseRedirect(urlresolvers.reverse('edit_track',
