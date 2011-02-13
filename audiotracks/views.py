@@ -65,7 +65,7 @@ def upload_track(request, username):
 
 @login_required
 def edit_track(request, username, track_id):
-    track = Track.objects.get(id=track_id)
+    track = request.user.tracks.get(id=track_id)
     if request.method == "POST":
         form = TrackEditForm(request.POST, request.FILES, instance=track)
         if form.is_valid():
