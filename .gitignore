@@ -1,4 +1,14 @@
+# Vim backup files
 *.swp
+
+# Python bytecode files
 *.pyc
 *.pyo
+
+# Package metadata
 django_audiotracks.egg-info
+
+# Test data
+tests/site_media
+example_project/db.sqlite3
+example_project/site_media/
