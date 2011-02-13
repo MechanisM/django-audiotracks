@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 from django.contrib.auth.decorators import login_required
@@ -17,7 +18,7 @@ from audiotracks.models import Track
 class TrackUploadForm(forms.ModelForm):
     class Meta:
         model = Track
-        fields = ('audiofile',)
+        fields = ('audio_file',)
 
 class TrackEditForm(forms.ModelForm):
     class Meta:
@@ -34,8 +35,8 @@ def user_index(request, username):
     return render_to_response("audiotracks/user_index.html", {'username': username, 
         'tracks': tracks}, context_instance=RequestContext(request))
 
-def track_detail(request, username, track_id):
-    track = Track.objects.get(id=track_id)
+def track_detail(request, username, track_slug):
+    track = Track.objects.get(slug=track_slug)
     return render_to_response("audiotracks/detail.html", {'username': username, 'track': track}, 
             context_instance=RequestContext(request))
 
@@ -46,9 +47,9 @@ def upload_track(request, username):
     if request.method == "POST":
         form = TrackUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            audiofile = request.FILES['audiofile']
-            audiofile_path = audiofile.temporary_file_path()
-            metadata = mutagen.File(audiofile_path, easy=True)
+            audio_file = request.FILES['audio_file']
+            audio_file_path = audio_file.temporary_file_path()
+            metadata = mutagen.File(audio_file_path, easy=True)
             track = form.save(commit=False)
             track.user = request.user
             for field in ('title', 'artist', 'genre', 'description', 'date'):
@@ -73,7 +74,13 @@ def edit_track(request, username, track_id):
                 args=[username]))
     else:
         form = TrackEditForm(instance=track, )
-    return render_to_response("audiotracks/edit.html", 
-            {'form': form, 'track_id': track_id}, 
-            context_instance=RequestContext(request))
+    track_url_prefix = request.build_absolute_uri(urlresolvers.reverse('track_detail',
+        args=[username, '']))
+    track_filename = os.path.basename(track.audio_file.name)
+    return render_to_response("audiotracks/edit.html", {
+        'form': form,
+        'track': track, 
+        'track_url_prefix': track_url_prefix,
+        'track_filename': track_filename,
+        }, context_instance=RequestContext(request))
 

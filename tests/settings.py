@@ -14,4 +14,3 @@ INSTALLED_APPS = (
     "audiotracks",
 
 )
-

@@ -5,9 +5,8 @@
 <ul class="audiotracks-list">
 {% for track in tracks %}
 <li>
-<a href="{% url track_detail username,track.id %}">{{ track.title }}</a>
-uploaded by 
-<a href="{% url profile_detail username=track.user.username %}">{{ track.user.username }}</a>
+<a href="{% url track_detail username,track.slug %}">{{ track.title }}</a>
+uploaded by {{ track.user.username }}
 on {{ track.created_at|date:"l d M Y" }}
 </li>
 {% endfor %}

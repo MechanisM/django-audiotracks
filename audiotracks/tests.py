@@ -24,12 +24,13 @@ class TestViews(TestCase):
         filehandle = open(filepath)
         resp = self.client.post('/bob/music/upload_track', {
             'name': filename,
-            'audiofile': filehandle
+            'audio_file': filehandle
             })
 
     def verify_upload(self):
         track = Track.objects.get(genre="Test Data")
         self.assertEquals(track.title, "django-audiotracks test file")
+        self.assertEquals(track.slug, "django-audiotracks-test-file")
 
     def test_upload_ogg(self):
         self.do_upload('ogg')
@@ -47,4 +48,17 @@ class TestViews(TestCase):
         self.do_upload('wav')
         # WAV file metadata not currently supported
         track = Track.objects.get(id=1)
-        assert 'wav' in track.audiofile.name
+        assert 'wav' in track.audio_file.name
+        self.assertEquals(track.slug, "audio_filewav")
+
+    def test_detail(self):
+        self.do_upload('ogg')
+        resp = self.client.get('/al/music/track/django-audiotracks-test-file')
+        assert 'Alex' in resp.content
+        assert 'Test Data' in resp.content
+
+    def test_latest(self):
+        self.do_upload('ogg')
+        resp = self.client.get('/al/music')
+        # Check that slug is in listing content
+        assert 'django-audiotracks-test-file' in resp.content
