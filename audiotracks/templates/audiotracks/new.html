@@ -1,0 +1,17 @@
+{% extends "audiotracks/base.html" %}
+{% load i18n %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<form method="POST" enctype="multipart/form-data" action="{% url upload_track user.username %}">
+  {% csrf_token %}
+  <fieldset>
+    <legend>{% trans 'Upload a new track' %}</legend>
+    {{ form.as_p }}
+    <p>
+    <input type="submit" value="{% trans 'Upload' %}" />
+    </p>
+  </fieldset>
+</form>
+{% endif %}
+{% endblock %}

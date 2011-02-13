@@ -1,0 +1,15 @@
+{% extends "audiotracks/base.html" %}
+{% load i18n %}
+
+{% block body %}
+<h2>Your Tracks</h2>
+<ul class="audiotracks-list">
+{% for track in tracks %}
+<li>
+<a href="{% url track_detail username,track.id %}">{{ track.title }}</a>
+last modified {{ track.updated_at|date:"l d M Y G:i" }}
+  <a href="{% url edit_track username,track.id %}">[{% trans 'Edit' %}]</a>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}

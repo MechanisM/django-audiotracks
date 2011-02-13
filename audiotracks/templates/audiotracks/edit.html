@@ -1,0 +1,18 @@
+{% extends "audiotracks/base.html" %}
+{% load i18n %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<form method="POST" enctype="multipart/form-data" 
+      action="{% url edit_track user.username,track_id %}">
+  {% csrf_token %}
+  <fieldset>
+    <legend>{% trans 'Edit track' %}</legend>
+    {{ form.as_p }}
+    <p>
+    <input type="submit" value="{% trans 'Save your changes' %}" />
+    </p>
+  </fieldset>
+</form>
+{% endif %}
+{% endblock %}
