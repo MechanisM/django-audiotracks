@@ -10,6 +10,8 @@
       .audiotracks-edit-row > div { float: left; margin-right: 1em; }
       .audiotracks-form { margin-bottom: 1em; }
       .audiotracks-delete-image-label { display: inline; }
+      .messages { color: green; border: solid 1px green; padding: 0.2em; }
+      .messages li { list-style: none; }
     </style>
   </head>
   <body>
@@ -25,6 +27,14 @@
           &nbsp;
       {% endif %}
   {% endblock %}
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
 
   {% block body %}
   {% endblock %}

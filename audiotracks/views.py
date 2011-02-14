@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 import mutagen
 
 from audiotracks.models import Track
@@ -73,7 +74,8 @@ def edit_track(request, username, track_id):
             if 'delete_image' in request.POST:
                 track.image = None
                 track.save()
-            return HttpResponseRedirect(urlresolvers.reverse('audiotracks',
+            messages.add_message(request, messages.INFO, 'Your changes have been saved.')
+            return HttpResponseRedirect(urlresolvers.reverse('user_index',
                 args=[username]))
     else:
         form = TrackEditForm(instance=track, )
@@ -101,4 +103,5 @@ def delete_track(request, username):
     track_id = request.POST.get('track_id')
     track = request.user.tracks.get(id=track_id)
     track.delete()
+    messages.add_message(request, messages.INFO, '"%s" has been deleted.' % track.title)
     return HttpResponseRedirect(request.POST.get('came_from', '/'))
