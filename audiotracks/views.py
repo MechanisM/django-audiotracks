@@ -84,3 +84,18 @@ def edit_track(request, username, track_id):
         'track_filename': track_filename,
         }, context_instance=RequestContext(request))
 
+@login_required
+def confirm_delete_track(request, username, track_id):
+    track = request.user.tracks.get(id=track_id)
+    return render_to_response("audiotracks/confirm_delete.html", {
+        'track': track,
+        'came_from': request.GET.get('came_from', 
+            urlresolvers.reverse('user_index', args=[username]))
+        }, context_instance=RequestContext(request))
+
+@login_required
+def delete_track(request, username):
+    track_id = request.POST.get('track_id')
+    track = request.user.tracks.get(id=track_id)
+    track.delete()
+    return HttpResponseRedirect(request.POST.get('came_from', '/'))

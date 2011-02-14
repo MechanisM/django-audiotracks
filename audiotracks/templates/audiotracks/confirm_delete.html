@@ -1,0 +1,18 @@
+{% extends "audiotracks/base.html" %}
+{% load i18n %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<div class="audiotracks-form">
+  <p>
+  Are you sure you want to delete "{{ track.title }}"? This can't be undone.
+  </p>
+  <form method="POST" action="{% url delete_track user.username %}">
+    {% csrf_token %}
+    <input type="hidden" name="track_id" value="{{ track.id }}">
+    <input type="hidden" name="came_from" value="{{ came_from }}">
+    <button>{% trans 'Yes, delete this track' %}</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

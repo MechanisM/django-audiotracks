@@ -62,3 +62,17 @@ class TestViews(TestCase):
         resp = self.client.get('/al/music')
         # Check that slug is in listing content
         assert 'django-audiotracks-test-file' in resp.content
+
+    def test_confirm_delete_track(self):
+        self.do_upload('ogg')
+        track = Track.objects.get(genre="Test Data")
+        resp = self.client.get('/al/music/confirm_delete_track/%s' % track.id)
+        assert 'Are you sure' in resp.content
+
+    def test_delete_track(self):
+        self.do_upload('ogg')
+        track = Track.objects.get(genre="Test Data")
+        resp = self.client.post('/al/music/delete_track', {'track_id': track.id,
+            'came_from': '/somewhere'})
+        self.assertEquals(Track.objects.count(), 0)
+
