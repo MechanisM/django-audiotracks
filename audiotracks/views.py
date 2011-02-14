@@ -70,6 +70,9 @@ def edit_track(request, username, track_id):
         form = TrackEditForm(request.POST, request.FILES, instance=track)
         if form.is_valid():
             track = form.save()
+            if 'delete_image' in request.POST:
+                track.image = None
+                track.save()
             return HttpResponseRedirect(urlresolvers.reverse('audiotracks',
                 args=[username]))
     else:

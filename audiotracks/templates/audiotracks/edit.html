@@ -21,7 +21,10 @@
         <label for="id_image">{{ form.image.label }}:</label>
         {{ form.image }}
         {% if track.image %}
-        <img src="{{ track.image.url_48x48 }}" alt="Track image">
+          <img src="{{ track.image.url_48x48 }}" alt="Track image">
+          <input type="checkbox" name="delete_image" value="1"
+          id="delete_image">
+          <label class="audiotracks-delete-image-label" for="delete_image">Delete image</label>
         {% endif %}
       </div>
       <div class="audiotracks-edit-row">
