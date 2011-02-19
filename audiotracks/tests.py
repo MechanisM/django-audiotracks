@@ -11,17 +11,19 @@ from audiotracks.models import Track
 
 TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))), 'tests', 'data')
 
-class TestViews(TestCase):
+class TestViewsBase(TestCase):
 
     urls = 'test_urls'
 
     def setUp(self):
         User.objects.create_user("bob", "bob@example.com", "secret")
+        User.objects.create_user("alice", "alice@example.com", "secret")
         self.client = Client()
         response = self.client.login(username='bob', password='secret')
 
     def tearDown(self):
-        shutil.rmtree(settings.MEDIA_ROOT)
+        if os.path.exists(settings.MEDIA_ROOT):
+            shutil.rmtree(settings.MEDIA_ROOT)
 
     def do_upload(self, ext):
         filename = "audio_file." + ext
@@ -36,6 +38,18 @@ class TestViews(TestCase):
         track = Track.objects.get(genre="Test Data")
         self.assertEquals(track.title, "django-audiotracks test file")
         self.assertEquals(track.slug, "django-audiotracks-test-file")
+
+    def do_edit(self, track, **params):
+        default_params = {
+            'title': 'New Title',
+            'genre': 'New Genre',
+            }
+        default_params.update(params)
+        return self.client.post('/al/music/edit_track/%s' % track.id,
+                default_params)
+
+    def test_multiuser(self):
+        self.assertFalse(getattr(settings, 'AUDIOTRACKS_MULTIUSER', False))
 
     def test_upload_ogg(self):
         self.do_upload('ogg')
@@ -66,31 +80,44 @@ class TestViews(TestCase):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
         resp = self.client.get('/al/music/edit_track/%s' % track.id)
-        resp = self.client.post('/al/music/edit_track/%s' % track.id, {
-            'title': 'New Title',
-            'genre': 'New Genre',
-            'slug': 'new-title',
-            })
+        self.do_edit(track, slug='new-title')
         track = Track.objects.get(genre="New Genre")
         self.assertEquals(track.title, 'New Title')
+
+    def test_edit_duplicate_slug(self):
+        # Upload a track
+        self.do_upload('ogg')
+
+        # Upload another one as another user
+        response = self.client.logout()
+        response = self.client.login(username='alice', password='secret')
+        self.do_upload('ogg')
+        bob_track, alice_track = Track.objects.all()
+        self.assertEquals(bob_track.slug, 'django-audiotracks-test-file')
+        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2')
+
+        # We should not be allowed to set the same slug for both tracks
+        self.do_edit(alice_track, slug='django-audiotracks-test-file')
+        tracks = Track.objects.all()
+        alice_track = tracks[1]
+        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2')
+
+        # However we should be allowed to set a different slug for that new track
+        self.do_edit(alice_track, slug='new-slug')
+        tracks = Track.objects.all()
+        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
+        self.assertEquals(alice_track.slug, 'new-slug')
 
     def test_delete_image(self):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
         resp = self.client.get('/al/music/edit_track/%s' % track.id)
-        resp = self.client.post('/al/music/edit_track/%s' % track.id, {
-            'title': 'New Title',
-            'slug': 'new-title',
-            'image': open(os.path.join(TEST_DATA_DIR, 'image.jpg')),
-            })
+        self.do_edit(track, slug='new-title',
+            image=open(os.path.join(TEST_DATA_DIR, 'image.jpg')))
         track = Track.objects.get(title="New Title")
         self.assert_(track.image.url.endswith('image.jpg'),
                 "Image should have been added")
-        resp = self.client.post('/al/music/edit_track/%s' % track.id, {
-            'title': 'New Title',
-            'slug': 'new-title',
-            'delete_image': '1',
-            })
+        self.do_edit(track, slug='new-title', delete_image='1')
         track = Track.objects.get(title="New Title")
         self.assertFalse(track.image, "Image should have been deleted")
 
@@ -112,4 +139,3 @@ class TestViews(TestCase):
         resp = self.client.post('/al/music/delete_track', {'track_id': track.id,
             'came_from': '/somewhere'})
         self.assertEquals(Track.objects.count(), 0)
-
