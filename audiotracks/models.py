@@ -31,7 +31,7 @@ class Track(models.Model):
     genre = models.CharField(max_length="200", null=True, blank=True)
     date = models.CharField(max_length="200", null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    slug = models.SlugField(unique=True, verbose_name="Slug (last part of the url)")
+    slug = models.SlugField(verbose_name="Slug (last part of the url)")
 
     def __unicode__(self):
         return "Track '%s' uploaded by '%s'" % (self.title, self.user.username)

@@ -29,10 +29,15 @@ class TestViewsBase(TestCase):
         filename = "audio_file." + ext
         filepath = os.path.join(TEST_DATA_DIR, filename)
         filehandle = open(filepath)
-        resp = self.client.post('/bob/music/upload_track', {
+        resp = self.client.post('/music/upload', {
             'name': filename,
             'audio_file': filehandle
             })
+
+    def do_upload_as_user(self, username):
+        response = self.client.logout()
+        response = self.client.login(username=username, password='secret')
+        self.do_upload('ogg')
 
     def verify_upload(self):
         track = Track.objects.get(genre="Test Data")
@@ -45,11 +50,8 @@ class TestViewsBase(TestCase):
             'genre': 'New Genre',
             }
         default_params.update(params)
-        return self.client.post('/al/music/edit_track/%s' % track.id,
+        return self.client.post('/music/edit/%s' % track.id,
                 default_params)
-
-    def test_multiuser(self):
-        self.assertFalse(getattr(settings, 'AUDIOTRACKS_MULTIUSER', False))
 
     def test_upload_ogg(self):
         self.do_upload('ogg')
@@ -79,39 +81,53 @@ class TestViewsBase(TestCase):
     def test_edit(self):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
-        resp = self.client.get('/al/music/edit_track/%s' % track.id)
         self.do_edit(track, slug='new-title')
         track = Track.objects.get(genre="New Genre")
         self.assertEquals(track.title, 'New Title')
 
-    def test_edit_duplicate_slug(self):
+    def test_edit_duplicate_slug_multi_user(self):
+        self.assertTrue(getattr(settings, 'AUDIOTRACKS_MULTIUSER', False))
+
         # Upload a track
         self.do_upload('ogg')
 
         # Upload another one as another user
-        response = self.client.logout()
-        response = self.client.login(username='alice', password='secret')
-        self.do_upload('ogg')
+        self.do_upload_as_user('alice')
         bob_track, alice_track = Track.objects.all()
         self.assertEquals(bob_track.slug, 'django-audiotracks-test-file')
         self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2')
 
-        # We should not be allowed to set the same slug for both tracks
+        # We should be allowed to set the same slug for both tracks
         self.do_edit(alice_track, slug='django-audiotracks-test-file')
         tracks = Track.objects.all()
         alice_track = tracks[1]
-        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2')
+        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file')
 
-        # However we should be allowed to set a different slug for that new track
-        self.do_edit(alice_track, slug='new-slug')
-        tracks = Track.objects.all()
-        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
-        self.assertEquals(alice_track.slug, 'new-slug')
+#    def test_edit_duplicate_slug_single_user(self):
+#        setattr(settings, 'AUDIOTRACKS_MULTIUSER', False)
+
+#        # Upload a track
+#        self.do_upload('ogg')
+
+#        # Upload another one as another user
+#        self.do_upload_as_user('alice')
+#        bob_track, alice_track = Track.objects.all()
+
+#        # We should not be allowed to set the same slug for both tracks
+#        self.do_edit(alice_track, slug='django-audiotracks-test-file')
+#        bob_track, alice_track = Track.objects.all()
+#        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2',
+#                'We should not be allowed to set the same slug for both tracks')
+
+#        # However we should be allowed to set a different slug for that new track
+#        self.do_edit(alice_track, slug='new-slug')
+#        tracks = Track.objects.all()
+#        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
+#        self.assertEquals(alice_track.slug, 'new-slug')
 
     def test_delete_image(self):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
-        resp = self.client.get('/al/music/edit_track/%s' % track.id)
         self.do_edit(track, slug='new-title',
             image=open(os.path.join(TEST_DATA_DIR, 'image.jpg')))
         track = Track.objects.get(title="New Title")
@@ -130,12 +146,12 @@ class TestViewsBase(TestCase):
     def test_confirm_delete_track(self):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
-        resp = self.client.get('/al/music/confirm_delete_track/%s' % track.id)
+        resp = self.client.get('/music/confirm_delete/%s' % track.id)
         assert 'Are you sure' in resp.content
 
     def test_delete_track(self):
         self.do_upload('ogg')
         track = Track.objects.get(genre="Test Data")
-        resp = self.client.post('/al/music/delete_track', {'track_id': track.id,
+        resp = self.client.post('/music/delete', {'track_id': track.id,
             'came_from': '/somewhere'})
         self.assertEquals(Track.objects.count(), 0)

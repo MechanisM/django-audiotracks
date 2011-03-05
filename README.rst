@@ -7,11 +7,13 @@ A pluggable Django_ app to publish audio tracks.
 Introduction
 ~~~~~~~~~~~~
 
-django-audiotracks is a simple reusable Django_ application to allow users to
+django-audiotracks is a simple reusable Django_ application that allow users to
 publish audio tracks on your web site. It provides a Track model, a set of
-views, default templates and sensible defaut URL configuration. A basic
-example_project is provided along the source code. It uses mutagen_ to extract
-metadata from the audio files and prefill track attributes. 
+views, default templates and sensible defaut URL configuration.  It uses
+mutagen_ to extract metadata from the audio files and prefill track attributes.
+PIL is also required to process the image that can be attached to a track.  
+
+A basic example_project is provided with the source code.
 
 Installation
 ~~~~~~~~~~~~
@@ -24,13 +26,16 @@ can use it with a command such as::
 Mount the app in your root ROOT_URLCONF_ by adding a piece of code similar to::
 
     urlpatterns += patterns('',
+        # In the example we mount the app under /music. Feel free to use
+        # something else
         url("^music", include("audiotracks.urls")),
-        # The following line is optional. Use it if you need to select
+        # The following line is optional. Use it if you wish to select
         # tracks by username.
         url("^(?P<username>[\w\._-]+)/music", include("audiotracks.urls")),
     )
 
-Synchronize your database with::
+Edit ``settings.py`` and add ``'audiotracks`` to your list of
+``INSTALLED_APPS``. Then synchronize your database with::
 
     $ python manage.py syncdb
 
@@ -46,8 +51,9 @@ ______
 * View function: ``upload_track``
 * Default URL: <app_mount_point>/upload
 
-This wiew allows users to upload an audio file to the app. Metadata is extracted
-from the file and used to prefill track attributes. Users get redirected to the edit view.
+This wiew allows authenticated users to upload an audio file to the app.
+Metadata is extracted from the file and used to prefill track attributes. Users
+get redirected to the edit view.
 
 Edit
 ____
@@ -55,7 +61,9 @@ ____
 * View function: ``edit_track``
 * Default URL: <app_mount_point>/edit
 
-Allow users to edit track attributes such as title, artist name, etc., upload an image to attach to the track or replace the audio file itself. Modified metadata are stored back in the audio file itself.
+Allow users to edit track attributes such as title, artist name, etc., upload an
+image to attach to the track or replace the audio file itself. Modified metadata
+are stored back in the audio file itself.
 
 Display
 _______
@@ -90,7 +98,7 @@ User tracks listing
 ___________________
 
 * View function: ``user_index``
-* Default URL: <app_mount_point_containing_username>/
+* Default URL: <app_mount_point_with_username>/
 
 If the app is mounted with a pattern containing a username such as
 ``"^(?P<username>[\w\._-]+)/music"``, a URL such as /bob/music will display a

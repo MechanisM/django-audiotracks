@@ -43,7 +43,7 @@ def track_detail(request, username, track_slug):
 
 @login_required
 @csrf_exempt # request.POST is accessed by CsrfViewMiddleware
-def upload_track(request, username):
+def upload_track(request):
     request.upload_handlers = [TemporaryFileUploadHandler()] # before accessing POST
     if request.method == "POST":
         form = TrackUploadForm(request.POST, request.FILES)
@@ -58,14 +58,15 @@ def upload_track(request, username):
                     setattr(track, field, metadata.get(field)[0])
             track.save()
             return HttpResponseRedirect(urlresolvers.reverse('edit_track',
-                args=[username, track.id]))
+                args=[track.id]))
     else:
         form = TrackUploadForm()
     return render_to_response("audiotracks/new.html", {'form':form},
             context_instance=RequestContext(request))
 
 @login_required
-def edit_track(request, username, track_id):
+def edit_track(request, track_id):
+    username = request.user.username
     track = request.user.tracks.get(id=track_id)
     if request.method == "POST":
         form = TrackEditForm(request.POST, request.FILES, instance=track)
@@ -90,18 +91,18 @@ def edit_track(request, username, track_id):
         }, context_instance=RequestContext(request))
 
 @login_required
-def confirm_delete_track(request, username, track_id):
-    track = request.user.tracks.get(id=track_id)
+def confirm_delete_track(request, track_id):
+    track = get_object_or_404(request.user.tracks, id=track_id)
     return render_to_response("audiotracks/confirm_delete.html", {
         'track': track,
         'came_from': request.GET.get('came_from', 
-            urlresolvers.reverse('user_index', args=[username]))
+            urlresolvers.reverse('user_index', args=[request.user.username]))
         }, context_instance=RequestContext(request))
 
 @login_required
-def delete_track(request, username):
+def delete_track(request):
     track_id = request.POST.get('track_id')
-    track = request.user.tracks.get(id=track_id)
+    track = get_object_or_404(request.user.tracks, id=track_id)
     track.delete()
     messages.add_message(request, messages.INFO, '"%s" has been deleted.' % track.title)
     return HttpResponseRedirect(request.POST.get('came_from', '/'))
