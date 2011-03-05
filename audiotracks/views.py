@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 import mutagen
 
-from audiotracks.models import Track
+from audiotracks.models import Track, multiuser_mode
 
 
 class TrackUploadForm(forms.ModelForm):
@@ -22,9 +22,23 @@ class TrackUploadForm(forms.ModelForm):
         fields = ('audio_file',)
 
 class TrackEditForm(forms.ModelForm):
+
     class Meta:
         model = Track
         exclude = ('user', 'created_at', 'updated_at')
+
+    def clean_slug(self):
+        new_slug = self.cleaned_data['slug']
+        if new_slug != self.instance._original_slug:
+            params = {'slug': new_slug}
+            if multiuser_mode():
+                params['user'] = self.instance.user
+            if Track.objects.filter(**params).count():
+                raise forms.ValidationError("This URL is already taken.")
+
+        return new_slug
+
+
 
 def index(request, username):
     tracks = Track.objects.all()
@@ -36,8 +50,11 @@ def user_index(request, username):
     return render_to_response("audiotracks/user_index.html", {'username': username, 
         'tracks': tracks}, context_instance=RequestContext(request))
 
-def track_detail(request, username, track_slug):
-    track = Track.objects.get(slug=track_slug)
+def track_detail(request, track_slug, username=None):
+    params = {'slug': track_slug}
+    if multiuser_mode():
+        params['user__username'] = username
+    track = Track.objects.get(**params)
     return render_to_response("audiotracks/detail.html", {'username': username, 'track': track}, 
             context_instance=RequestContext(request))
 

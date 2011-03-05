@@ -22,6 +22,7 @@ class TestViewsBase(TestCase):
         response = self.client.login(username='bob', password='secret')
 
     def tearDown(self):
+        settings.AUDIOTRACKS_MULTIUSER = True
         if os.path.exists(settings.MEDIA_ROOT):
             shutil.rmtree(settings.MEDIA_ROOT)
 
@@ -70,13 +71,7 @@ class TestViewsBase(TestCase):
         # WAV file metadata not currently supported
         track = Track.objects.get(id=1)
         assert 'wav' in track.audio_file.name
-        self.assertEquals(track.slug, "audio_filewav")
-
-    def test_detail(self):
-        self.do_upload('ogg')
-        resp = self.client.get('/al/music/track/django-audiotracks-test-file')
-        assert 'Alex' in resp.content
-        assert 'Test Data' in resp.content
+        self.assertEquals(track.slug, "audio_file")
 
     def test_edit(self):
         self.do_upload('ogg')
@@ -94,36 +89,62 @@ class TestViewsBase(TestCase):
         # Upload another one as another user
         self.do_upload_as_user('alice')
         bob_track, alice_track = Track.objects.all()
-        self.assertEquals(bob_track.slug, 'django-audiotracks-test-file')
-        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2')
+        self.assertEquals(bob_track.slug, alice_track.slug,
+                "We should be able to create 2 tracks as 2 different users "
+                "with the same slug.")
 
-        # We should be allowed to set the same slug for both tracks
+        # We should be allowed to set the same slug for 2 tracks belonging to 2
+        # different users
         self.do_edit(alice_track, slug='django-audiotracks-test-file')
-        tracks = Track.objects.all()
-        alice_track = tracks[1]
+        _, alice_track  = Track.objects.all()
         self.assertEquals(alice_track.slug, 'django-audiotracks-test-file')
+        
+        # We should not be able to set the same slug for 2 tracks belonging to
+        # the same user
+        self.do_upload_as_user('alice')
+        _, existing_alice_track, new_alice_track = Track.objects.all()
+        self.do_edit(new_alice_track, slug='django-audiotracks-test-file')
+        _, existing_alice_track, new_alice_track = Track.objects.all()
+        self.assertEquals(new_alice_track.slug, 'django-audiotracks-test-file-2')
 
-#    def test_edit_duplicate_slug_single_user(self):
-#        setattr(settings, 'AUDIOTRACKS_MULTIUSER', False)
+    def test_get_track_single_user(self):
+        settings.AUDIOTRACKS_MULTIUSER = False
+        self.do_upload('ogg')
+        resp = self.client.get('/music/track/django-audiotracks-test-file')
+        resp = self.client.get('/user_should_be_ignored/music/track/django-audiotracks-test-file')
+        assert 'Alex' in resp.content
+        assert 'Test Data' in resp.content
 
-#        # Upload a track
-#        self.do_upload('ogg')
+    def test_get_track_different_user_same_slug(self):
+        self.do_upload_as_user('bob')
+        self.do_upload_as_user('alice')
+        bob_track, alice_track = Track.objects.all()
+        self.assertEquals(bob_track.user.username, 'bob')
+        self.assertEquals(alice_track.user.username, 'alice')
+        self.assertEquals(bob_track.slug, alice_track.slug)
+        self.client.get('/bob/music/track/' + bob_track.slug)
 
-#        # Upload another one as another user
-#        self.do_upload_as_user('alice')
-#        bob_track, alice_track = Track.objects.all()
+    def test_edit_duplicate_slug_single_user(self):
+        settings.AUDIOTRACKS_MULTIUSER = False
 
-#        # We should not be allowed to set the same slug for both tracks
-#        self.do_edit(alice_track, slug='django-audiotracks-test-file')
-#        bob_track, alice_track = Track.objects.all()
-#        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2',
-#                'We should not be allowed to set the same slug for both tracks')
+        # Upload a track
+        self.do_upload('ogg')
 
-#        # However we should be allowed to set a different slug for that new track
-#        self.do_edit(alice_track, slug='new-slug')
-#        tracks = Track.objects.all()
-#        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
-#        self.assertEquals(alice_track.slug, 'new-slug')
+        # Upload another one as another user
+        self.do_upload_as_user('alice')
+        bob_track, alice_track = Track.objects.all()
+
+        # We should not be allowed to set the same slug for both tracks
+        self.do_edit(alice_track, slug='django-audiotracks-test-file')
+        bob_track, alice_track = Track.objects.all()
+        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2',
+                'We should not be allowed to set the same slug for both tracks')
+
+        # However we should be allowed to set a different slug for that new track
+        self.do_edit(alice_track, slug='new-slug')
+        tracks = Track.objects.all()
+        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
+        self.assertEquals(alice_track.slug, 'new-slug')
 
     def test_delete_image(self):
         self.do_upload('ogg')

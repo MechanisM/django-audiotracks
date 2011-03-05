@@ -5,7 +5,7 @@
 {% if user.is_authenticated %}
 <div class="audiotracks-form">
   <form method="POST" enctype="multipart/form-data" 
-    action="{% url edit_track user.username,track.id %}">
+    action="{% url edit_track track.id %}">
     {% csrf_token %}
     <fieldset>
       <legend>{% trans 'Edit track' %}</legend>
@@ -68,7 +68,7 @@
   </form>
 </div>
 <div class="audiotracks-form">
-  <form action="{% url confirm_delete_track user.username,track.id %}">
+  <form action="{% url confirm_delete_track track.id %}">
     <button>Delete this track</button>
   </form>
 </div>

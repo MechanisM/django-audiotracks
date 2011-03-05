@@ -7,6 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
      (r'^$', 'main.views.index'),
+    url("^music", include("audiotracks.urls")),
     url("^(?P<username>[\w\._-]+)/music", include("audiotracks.urls")),
 
     # Uncomment the admin/doc line below to enable admin documentation:

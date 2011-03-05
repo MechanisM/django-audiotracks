@@ -3,7 +3,7 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<form method="POST" enctype="multipart/form-data" action="{% url upload_track user.username %}">
+<form method="POST" enctype="multipart/form-data" action="{% url upload_track %}">
   {% csrf_token %}
   <fieldset>
     <legend>{% trans 'Upload a new track' %}</legend>
