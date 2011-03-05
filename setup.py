@@ -21,7 +21,8 @@ setup(
         'Framework :: Django',
     ],
     install_requires = [
-        'mutagen==1.20'
+        'mutagen==1.20',
+        'PIL'
         ],
     include_package_data=True,
     zip_safe=False,
