@@ -15,6 +15,25 @@ PIL is also required to process the image that can be attached to a track.
 
 A basic example_project is provided with the source code.
 
+Configuration
+~~~~~~~~~~~~~
+
+The app supports a single user mode and a multi user. These two modes impact
+URL schemes and file storage. 
+
+Multi-user mode is intended to be used on community websites where each user
+will want to manage a personal collection of tracks. In this mode URLs will
+typically contain the username and look like /bob/sound/track/my-good-tune. A
+per user track listing view is also provided provided.
+
+Single user mode should be used when the whole website is for a single author.
+URLs won't contain the author's username and a per user track listing won't
+make sense. This doesn't mean that behind the scene tracks can't be managed by
+several users but if it's the case, it won't be noticeable to visitors.
+
+Set ``AUDIOTRACKS_MULTIUSER`` in your ``settings.py`` to either ``True`` or
+``False`` in order to configure the mode.
+
 Installation
 ~~~~~~~~~~~~
 
@@ -109,11 +128,6 @@ _____________________
 
 * View function: ``latest_tracks``
 * Default URL: <app_mount_point_with_optional_username>/latest
-
-If the app is mounted with a pattern containing a username such as
-``"^(?P<username>[\w\._-]+)/music"``, this shows latest tracks uploaded by
-bob. If the URL pattern doesn't contain a ``username``, it shows latest
-tracks uploaded by any user.
 
 
 .. _`Django`: http://djangoproject.com
