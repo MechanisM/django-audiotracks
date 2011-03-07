@@ -1,13 +1,18 @@
 {% extends "audiotracks/base.html" %}
+{% load i18n %}
 
 {% block body %}
 <h2>Latest Tracks</h2>
 <ul class="audiotracks-list">
 {% for track in tracks %}
 <li>
-<a href="{% url track_detail username,track.slug %}">{{ track.title }}</a>
+<a href="{% if multiuser_mode %}{% url track_detail track.slug,username %}{% else %}{% url track_detail track.slug %}{% endif %}">{{ track.title }}</a>
 uploaded by {{ track.user.username }}
 on {{ track.created_at|date:"l d M Y" }}
+{% if track.user == request.user %}
+  <a href="{% url edit_track track.id %}">[{% trans 'Edit' %}]</a>
+  <a href="{% url confirm_delete_track track.id %}">[{% trans 'Delete' %}]</a>
+{% endif %}
 </li>
 {% endfor %}
 </ul>

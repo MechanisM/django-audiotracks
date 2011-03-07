@@ -40,7 +40,7 @@ class TrackEditForm(forms.ModelForm):
 
 
 
-def index(request, username):
+def index(request, username=None):
     tracks = Track.objects.all()
     return render_to_response("audiotracks/latest.html", {'username': username, 
         'tracks': tracks}, context_instance=RequestContext(request))
@@ -61,7 +61,9 @@ def track_detail(request, track_slug, username=None):
 @login_required
 @csrf_exempt # request.POST is accessed by CsrfViewMiddleware
 def upload_track(request):
-    request.upload_handlers = [TemporaryFileUploadHandler()] # before accessing POST
+    # Disable in memory upload before accessing POST 
+    # because we need a file from which to read metadata
+    request.upload_handlers = [TemporaryFileUploadHandler()] 
     if request.method == "POST":
         form = TrackUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -93,12 +95,18 @@ def edit_track(request, track_id):
                 track.image = None
                 track.save()
             messages.add_message(request, messages.INFO, 'Your changes have been saved.')
-            return HttpResponseRedirect(urlresolvers.reverse('user_index',
-                args=[username]))
+            if multiuser_mode():
+                redirect_url = urlresolvers.reverse('user_index', args=[username])
+            else:
+                redirect_url = urlresolvers.reverse('audiotracks')
+            return HttpResponseRedirect(redirect_url)
     else:
         form = TrackEditForm(instance=track, )
+    track_url_args = ['']
+    if multiuser_mode():
+        track_url_args.insert(0, username)
     track_url_prefix = request.build_absolute_uri(urlresolvers.reverse('track_detail',
-        args=[username, '']))
+        args=track_url_args))
     track_filename = os.path.basename(track.audio_file.name)
     return render_to_response("audiotracks/edit.html", {
         'form': form,
@@ -110,10 +118,14 @@ def edit_track(request, track_id):
 @login_required
 def confirm_delete_track(request, track_id):
     track = get_object_or_404(request.user.tracks, id=track_id)
+    if multiuser_mode():
+        default_origin_url = urlresolvers.reverse('user_index',
+                args=[request.user.username])
+    else:
+        default_origin_url = urlresolvers.reverse('audiotracks')
     return render_to_response("audiotracks/confirm_delete.html", {
         'track': track,
-        'came_from': request.GET.get('came_from', 
-            urlresolvers.reverse('user_index', args=[request.user.username]))
+        'came_from': request.GET.get('came_from', default_origin_url)
         }, context_instance=RequestContext(request))
 
 @login_required

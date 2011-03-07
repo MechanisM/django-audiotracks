@@ -7,7 +7,7 @@
   </head>
   <body>
     {% if user.is_authenticated %}
-    <a href="{% url audiotracks user.username %}">Go to audiotracks</a>
+    <a href="{% url audiotracks %}">Go to audiotracks</a>
     {% else %}
     <a href="/admin">Login</a>
     {% endif %}
