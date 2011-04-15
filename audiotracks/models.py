@@ -27,6 +27,19 @@ def slugify_uniquely(value, obj, slugfield="slug"):
         suffix += 1
 
 
+def get_upload_path(dirname, obj, filename):
+    if multiuser_mode():
+        return os.path.join("audiotracks", dirname, obj.user.username, filename)
+    else:
+        return os.path.join("audiotracks", dirname, filename)
+
+def get_images_upload_path(obj, filename):
+    return get_upload_path("images", obj, filename)
+
+def get_audio_upload_path(obj, filename):
+    return get_upload_path("audio_files", obj, filename)
+
+
 class Track(models.Model):
     user = models.ForeignKey(User,
         related_name = "tracks",
@@ -35,8 +48,8 @@ class Track(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    audio_file = models.FileField(upload_to="audiotracks/audio_files")
-    image = ImageWithThumbsField(upload_to="audiotracks/images", null=True,
+    audio_file = models.FileField(upload_to=get_audio_upload_path)
+    image = ImageWithThumbsField(upload_to=get_images_upload_path, null=True,
             blank=True, sizes=((48,48), (200,200)))
     title = models.CharField(max_length="200", null=True)
     artist = models.CharField(max_length="200", null=True, blank=True)

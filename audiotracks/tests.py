@@ -11,6 +11,7 @@ from audiotracks.models import Track
 
 TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))), 'tests', 'data')
 
+
 class TestViewsMixin(object):
     """
     Mixin class which contains methods used by both single user mode and multi
@@ -40,6 +41,14 @@ class TestViewsMixin(object):
         response = self.client.logout()
         response = self.client.login(username=username, password='secret')
         self.do_upload('ogg')
+        if settings.AUDIOTRACKS_MULTIUSER:
+            self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
+                "audiotracks", "audio_files", username, "audio_file.ogg")), 
+                "Upload path should contain username")
+        else:
+            self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
+                "audiotracks", "audio_files", "audio_file.ogg")), 
+                "Upload path should not contain username")
 
     def verify_upload(self):
         track = Track.objects.get(genre="Test Data")
