@@ -7,15 +7,11 @@ from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from thumbs import ImageWithThumbsField
 
-def multiuser_mode():
-    return getattr(settings, 'AUDIOTRACKS_MULTIUSER', False)
-
 def slugify_uniquely(value, obj, slugfield="slug"): 
     suffix = 1
     potential = base = slugify(value)
     filter_params = {}
-    if multiuser_mode():
-        filter_params['user'] = obj.user
+    filter_params['user'] = obj.user
     while True:
         if suffix > 1:
             potential = "-".join([base, str(suffix)])
@@ -28,10 +24,7 @@ def slugify_uniquely(value, obj, slugfield="slug"):
 
 
 def get_upload_path(dirname, obj, filename):
-    if multiuser_mode():
-        return os.path.join("audiotracks", dirname, obj.user.username, filename)
-    else:
-        return os.path.join("audiotracks", dirname, filename)
+    return os.path.join("audiotracks", dirname, obj.user.username, filename)
 
 def get_images_upload_path(obj, filename):
     return get_upload_path("images", obj, filename)

@@ -12,11 +12,13 @@ from audiotracks.models import Track
 TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))), 'tests', 'data')
 
 
-class TestViewsMixin(object):
+class TestViews(TestCase):
     """
     Mixin class which contains methods used by both single user mode and multi
     user mode.
     """
+
+    urls = 'urls'
 
     def setUp(self):
         User.objects.create_user("bob", "bob@example.com", "secret")
@@ -41,14 +43,9 @@ class TestViewsMixin(object):
         response = self.client.logout()
         response = self.client.login(username=username, password='secret')
         self.do_upload('ogg')
-        if settings.AUDIOTRACKS_MULTIUSER:
-            self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
-                "audiotracks", "audio_files", username, "audio_file.ogg")), 
-                "Upload path should contain username")
-        else:
-            self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
-                "audiotracks", "audio_files", "audio_file.ogg")), 
-                "Upload path should not contain username")
+        self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
+            "audiotracks", "audio_files", username, "audio_file.ogg")), 
+            "Upload path should contain username")
 
     def verify_upload(self):
         track = Track.objects.get(genre="Test Data")
@@ -124,57 +121,6 @@ class TestViewsMixin(object):
             'came_from': '/somewhere'})
         self.assertEquals(Track.objects.count(), 0)
 
-
-class TestSingleUser(TestViewsMixin, TestCase):
-
-    urls = 'single_user_urls'
-
-    def setUp(self):
-        settings.AUDIOTRACKS_MULTIUSER = False
-        super(TestSingleUser, self).setUp()
-
-    def test_latest(self):
-        "Get latest tracks"
-        self.do_upload('ogg')
-        resp = self.client.get('/music')
-        # Check that slug is in listing content
-        assert 'django-audiotracks-test-file' in resp.content
-
-    def test_get_track(self):
-        "Get track in single user mode"
-        self.do_upload('ogg')
-        resp = self.client.get('/music/track/django-audiotracks-test-file')
-
-    def test_prevent_duplicate_slug(self):
-        "In single user mode, prevent duplicate slug accross the whole database"
-        # Upload a track
-        self.do_upload('ogg')
-
-        # Upload another one as another user
-        self.do_upload_as_user('alice')
-        bob_track, alice_track = Track.objects.all()
-
-        # We should not be allowed to set the same slug for both tracks
-        self.do_edit(alice_track, slug='django-audiotracks-test-file')
-        bob_track, alice_track = Track.objects.all()
-        self.assertEquals(alice_track.slug, 'django-audiotracks-test-file-2',
-                'We should not be allowed to set the same slug for both tracks')
-
-        # However we should be allowed to set a different slug for that new track
-        self.do_edit(alice_track, slug='new-slug')
-        tracks = Track.objects.all()
-        alice_track = Track.objects.get(id=alice_track.id) # Reload from db
-        self.assertEquals(alice_track.slug, 'new-slug')
-
-
-class TestMultiUser(TestViewsMixin, TestCase):
-
-    urls = 'multi_user_urls'
-
-    def setUp(self):
-        settings.AUDIOTRACKS_MULTIUSER = True
-        super(TestMultiUser, self).setUp()
-
     def test_latest(self):
         "Get latest tracks"
         self.do_upload('ogg')
@@ -183,7 +129,7 @@ class TestMultiUser(TestViewsMixin, TestCase):
         assert 'django-audiotracks-test-file' in resp.content
 
     def test_get_track(self):
-        "Get track in multiuser mode"
+        "Get track"
         self.do_upload_as_user('bob')
         self.do_upload_as_user('alice')
         bob_track, alice_track = Track.objects.all()
@@ -193,7 +139,7 @@ class TestMultiUser(TestViewsMixin, TestCase):
         self.client.get('/bob/music/track/' + bob_track.slug)
 
     def test_prevent_duplicate_slug(self):
-        "In multi-user mode, prevent duplicate slug for the same user"
+        "Prevent duplicate slug for the same user"
         # Upload a track
         self.do_upload('ogg')
 

@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 import mutagen
 
-from audiotracks.models import Track, multiuser_mode
+from audiotracks.models import Track
 
 
 class TrackUploadForm(forms.ModelForm):
@@ -31,8 +31,7 @@ class TrackEditForm(forms.ModelForm):
         new_slug = self.cleaned_data['slug']
         if new_slug != self.instance._original_slug:
             params = {'slug': new_slug}
-            if multiuser_mode():
-                params['user'] = self.instance.user
+            params['user'] = self.instance.user
             if Track.objects.filter(**params).count():
                 raise forms.ValidationError("This URL is already taken.")
 
@@ -52,8 +51,7 @@ def user_index(request, username):
 
 def track_detail(request, track_slug, username=None):
     params = {'slug': track_slug}
-    if multiuser_mode():
-        params['user__username'] = username
+    params['user__username'] = username
     track = Track.objects.get(**params)
     return render_to_response("audiotracks/detail.html", {'username': username, 'track': track}, 
             context_instance=RequestContext(request))
@@ -95,16 +93,12 @@ def edit_track(request, track_id):
                 track.image = None
                 track.save()
             messages.add_message(request, messages.INFO, 'Your changes have been saved.')
-            if multiuser_mode():
-                redirect_url = urlresolvers.reverse('user_index', args=[username])
-            else:
-                redirect_url = urlresolvers.reverse('audiotracks')
+            redirect_url = urlresolvers.reverse('user_index', args=[username])
             return HttpResponseRedirect(redirect_url)
     else:
         form = TrackEditForm(instance=track, )
     track_url_args = ['']
-    if multiuser_mode():
-        track_url_args.insert(0, username)
+    track_url_args.insert(0, username)
     track_url_prefix = request.build_absolute_uri(urlresolvers.reverse('track_detail',
         args=track_url_args))
     track_filename = os.path.basename(track.audio_file.name)
@@ -118,11 +112,8 @@ def edit_track(request, track_id):
 @login_required
 def confirm_delete_track(request, track_id):
     track = get_object_or_404(request.user.tracks, id=track_id)
-    if multiuser_mode():
-        default_origin_url = urlresolvers.reverse('user_index',
-                args=[request.user.username])
-    else:
-        default_origin_url = urlresolvers.reverse('audiotracks')
+    default_origin_url = urlresolvers.reverse('user_index',
+            args=[request.user.username])
     return render_to_response("audiotracks/confirm_delete.html", {
         'track': track,
         'came_from': request.GET.get('came_from', default_origin_url)

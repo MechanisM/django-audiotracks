@@ -15,25 +15,6 @@ PIL is also required to process the image that can be attached to a track.
 
 A basic example_project is provided with the source code.
 
-Configuration
-~~~~~~~~~~~~~
-
-The app supports a single user mode and a multi user. These two modes impact
-URL schemes and file storage. 
-
-Multi-user mode is intended to be used on community websites where each user
-will want to manage a personal collection of tracks. In this mode URLs will
-typically contain the username and look like /bob/sound/track/my-good-tune. A
-per user track listing view is also provided provided.
-
-Single user mode should be used when the whole website is for a single author.
-URLs won't contain the author's username and a per user track listing won't
-make sense. This doesn't mean that behind the scene tracks can't be managed by
-several users but if it's the case, it won't be noticeable to visitors.
-
-Set ``AUDIOTRACKS_MULTIUSER`` in your ``settings.py`` to either ``True`` or
-``False`` in order to configure the mode.
-
 Installation
 ~~~~~~~~~~~~
 
@@ -44,12 +25,11 @@ can use it with a command such as::
 
 Mount the app in your root ROOT_URLCONF_ by adding a piece of code similar to::
 
+
     urlpatterns += patterns('',
         # In the example we mount the app under /music. Feel free to use
         # something else
         url("^music", include("audiotracks.urls")),
-        # The following line is optional. Use it if you wish to select
-        # tracks by username.
         url("^(?P<username>[\w\._-]+)/music", include("audiotracks.urls")),
     )
 
@@ -88,11 +68,11 @@ Display
 _______
 
 * View function: ``track_detail``
-* URL: <app_mount_point_with_optional_username>/track/<slug>
+* URL: <app_mount_point_with_username>/track/<slug>
 
-Display track. If the URL pattern captures a ``username`` argument, it will be
-used in the query to select the track. For example, if the app is mounted using
-the pattern ``"^(?P<username>[\w\._-]+)/music"``, a URL such as
+Display track. The URL pattern should captures a ``username`` argument, it will
+be used in the query to select the track. For example, if the app is mounted
+using the pattern ``"^(?P<username>[\w\._-]+)/music"``, a URL such as
 /bob/music/track/love-forever will look for the track which slug is love-forever
 and has been uploaded by bob. Without a username it will just use the slug to
 find the track. A user who is logged in and owns the track can see links to the
@@ -127,7 +107,9 @@ Latest tracks listing
 _____________________
 
 * View function: ``latest_tracks``
-* Default URL: <app_mount_point_with_optional_username>/latest
+* Default URL: <app_mount_point>/
+
+Show latest tracks by all users.
 
 
 .. _`Django`: http://djangoproject.com
