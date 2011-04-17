@@ -43,7 +43,7 @@ class TrackEditForm(forms.ModelForm):
 
 
 def index(request, username=None):
-    tracks = Track.objects.all()
+    tracks = Track.objects.order_by('-created_at').all()
     return render_to_response("audiotracks/latest.html", {'username': username, 
         'tracks': tracks}, context_instance=RequestContext(request))
 
