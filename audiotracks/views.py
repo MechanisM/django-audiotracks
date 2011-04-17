@@ -11,10 +11,13 @@ from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+
 import mutagen
+from mutagen.easyid3 import EasyID3KeyError
 
 from audiotracks.models import Track
 
+METADATA_FIELDS = ('title', 'artist', 'genre', 'description', 'date')
 
 class TrackUploadForm(forms.ModelForm):
     class Meta:
@@ -70,7 +73,7 @@ def upload_track(request):
             metadata = mutagen.File(audio_file_path, easy=True)
             track = form.save(commit=False)
             track.user = request.user
-            for field in ('title', 'artist', 'genre', 'description', 'date'):
+            for field in METADATA_FIELDS:
                 if metadata and metadata.get(field):
                     setattr(track, field, metadata.get(field)[0])
             track.save()
@@ -88,6 +91,13 @@ def edit_track(request, track_id):
     if request.method == "POST":
         form = TrackEditForm(request.POST, request.FILES, instance=track)
         if form.is_valid():
+            metadata = mutagen.File(track.audio_file.path, easy=True)
+            for field in METADATA_FIELDS:
+                try:
+                    metadata[field] = getattr(track, field)
+                except EasyID3KeyError, e:
+                    pass
+            metadata.save()
             track = form.save()
             if 'delete_image' in request.POST:
                 track.image = None

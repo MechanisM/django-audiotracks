@@ -6,6 +6,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
+import mutagen
 
 from audiotracks.models import Track
 
@@ -84,13 +85,22 @@ class TestViews(TestCase):
         assert 'wav' in track.audio_file.name
         self.assertEquals(track.slug, "audio_file")
 
-    def test_edit(self):
+    def test_edit(self, ext='ogg'):
         "Edit track"
-        self.do_upload('ogg')
+        self.do_upload(ext)
         track = Track.objects.get(genre="Test Data")
         self.do_edit(track, slug='new-title')
         track = Track.objects.get(genre="New Genre")
         self.assertEquals(track.title, 'New Title')
+        audio_file_path = os.path.join(settings.MEDIA_ROOT,
+            "audiotracks", "audio_files", "bob", "audio_file.%s" % ext)
+        metadata = mutagen.File(audio_file_path, easy=True)
+        self.assertEquals(metadata['title'], ['New Title'])
+        self.assertEquals(metadata['genre'], ['New Genre'])
+
+    def test_edit_mp3(self):
+        "Edit MP3 track"
+        self.test_edit('mp3')
 
 
     def test_delete_image(self):
