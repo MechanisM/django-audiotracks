@@ -6,10 +6,18 @@
     <link rel="stylesheet" type="text/css" href="/style.css" media="screen">
   </head>
   <body>
-    {% if user.is_authenticated %}
+    {% if not user.is_authenticated %}
+    <p>
+    <a href="{% url django.contrib.auth.views.login %}?next=/music">Login</a> </a>
+    </p>
+    {% endif %}
+    <p>
     <a href="{% url audiotracks %}">Go to audiotracks</a>
-    {% else %}
-    <a href="/admin">Login</a>
+    </p>
+    {% if user.is_staff %}
+    <p>
+    <a href="/admin">Go to admin</a> </a>
+    </p>
     {% endif %}
   </body>
 </html>

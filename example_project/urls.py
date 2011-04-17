@@ -9,12 +9,8 @@ urlpatterns = patterns('',
      (r'^$', 'main.views.index'),
     url("^music", include("audiotracks.urls")),
     url("^(?P<username>[\w\._-]+)/music", include("audiotracks.urls")),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-     (r'^admin/', include(admin.site.urls)),
+    (r'^login$', 'django.contrib.auth.views.login'),
+    (r'^admin/', include(admin.site.urls)),
 )
 
 if settings.DEBUG:
