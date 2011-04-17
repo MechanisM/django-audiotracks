@@ -16,31 +16,9 @@ import mutagen
 from mutagen.easyid3 import EasyID3KeyError
 
 from audiotracks.models import Track
+from audiotracks.forms import TrackUploadForm, TrackEditForm
 
 METADATA_FIELDS = ('title', 'artist', 'genre', 'description', 'date')
-
-class TrackUploadForm(forms.ModelForm):
-    class Meta:
-        model = Track
-        fields = ('audio_file',)
-
-class TrackEditForm(forms.ModelForm):
-
-    class Meta:
-        model = Track
-        exclude = ('user', 'created_at', 'updated_at')
-
-    def clean_slug(self):
-        new_slug = self.cleaned_data['slug']
-        if new_slug != self.instance._original_slug:
-            params = {'slug': new_slug}
-            params['user'] = self.instance.user
-            if Track.objects.filter(**params).count():
-                raise forms.ValidationError("This URL is already taken.")
-
-        return new_slug
-
-
 
 def index(request, username=None):
     tracks = Track.objects.order_by('-created_at').all()

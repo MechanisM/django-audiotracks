@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
 from thumbs import ImageWithThumbsField
+from tagging.fields import TagField
 
 def slugify_uniquely(value, obj, slugfield="slug"): 
     suffix = 1
@@ -48,6 +49,7 @@ class Track(models.Model):
     artist = models.CharField(max_length="200", null=True, blank=True)
     genre = models.CharField(max_length="200", null=True, blank=True)
     date = models.CharField(max_length="200", null=True, blank=True)
+    tags = TagField()
     description = models.TextField(null=True, blank=True)
     slug = models.SlugField(verbose_name="Slug (last part of the url)")
     _original_slug = None # Used to detect slug change

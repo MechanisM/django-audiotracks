@@ -1,0 +1,5 @@
+<li>
+  <a href="{% url track_detail result.user.username, result.slug %}">{{ result.title }}</a>
+  uploaded by
+  <a href="{% url profile_detail username=result.user.username %}">{{ result.user.username }}</a>
+</li>
