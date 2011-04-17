@@ -102,6 +102,19 @@ class TestViews(TestCase):
         "Edit MP3 track"
         self.test_edit('mp3')
 
+    def test_edit_flac(self):
+        "Edit FLAC track"
+        self.test_edit('flac')
+
+    def test_edit_wav(self):
+        "Edit WAV track"
+        ext = 'wav'
+        self.do_upload(ext)
+        track = Track.objects.get(slug="audio_file")
+        self.do_edit(track, slug='new-title')
+        track = Track.objects.get(genre="New Genre")
+        self.assertEquals(track.title, 'New Title')
+
 
     def test_delete_image(self):
         "Attach and remove track image"

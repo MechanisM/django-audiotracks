@@ -70,12 +70,13 @@ def edit_track(request, track_id):
         form = TrackEditForm(request.POST, request.FILES, instance=track)
         if form.is_valid():
             metadata = mutagen.File(track.audio_file.path, easy=True)
-            for field in METADATA_FIELDS:
-                try:
-                    metadata[field] = getattr(track, field)
-                except EasyID3KeyError, e:
-                    pass
-            metadata.save()
+            if metadata:
+                for field in METADATA_FIELDS:
+                    try:
+                        metadata[field] = getattr(track, field)
+                    except EasyID3KeyError, e:
+                        pass
+                metadata.save()
             track = form.save()
             if 'delete_image' in request.POST:
                 track.image = None
