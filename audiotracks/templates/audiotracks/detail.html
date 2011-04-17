@@ -8,11 +8,14 @@
     {{ track.title }}
   </h1>
   <h2>
-    by {{ track.artist }}, {{ track.date }}
+    {% if track.artist %}by {{ track.artist }}{% endif %}
+    {% if track.date %}, {{ track.date }}{% endif %}
   </h2>
+  {% if track.genre %}
   <h3>
-     {{ track.genre }} 
+     Genre: {{ track.genre }} 
   </h3>
+  {% endif %}
   <div>
     <audio src="{{ track.audio_file.url }}" controls="controls">
       Your browser does not support the audio element.  Maybe you should
