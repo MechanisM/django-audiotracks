@@ -69,3 +69,7 @@ class Track(models.Model):
             self.slug = slugify_uniquely(slug_source, self)
         super(Track, self).save(**kwargs)
 
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('audiotracks.views.track_detail', [self.user.username, self.slug])
