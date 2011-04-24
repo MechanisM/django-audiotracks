@@ -1,0 +1,127 @@
+# French localization for django-audiotracks
+# Copyright (C) 2011 Alex Marandon
+# This file is distributed under the same license as the django-audiotracks package.
+# Alex Marandon <contact@alexmarandon.com>, 2011
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-24 13:46+0700\n"
+"PO-Revision-Date: 2011-04-24 13:37+007\n"
+"Last-Translator: Alex Marandon <contact@alexmarandon.com>\n"
+"Language-Team: Alex Marandon <contact@alexmarandon.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1;\n"
+
+#: models.py:46
+msgid "Audio file"
+msgstr "Fichier audio"
+
+#: models.py:47
+msgid "Image"
+msgstr ""
+
+#: models.py:49
+msgid "Title"
+msgstr "Titre"
+
+#: models.py:50
+msgid "Artist"
+msgstr "Artiste"
+
+#: models.py:51
+msgid "Genre"
+msgstr ""
+
+#: models.py:52
+#, fuzzy
+msgid "Date"
+msgstr "Date"
+
+#: models.py:53
+msgid "Tags"
+msgstr ""
+
+#: models.py:54
+msgid "Description"
+msgstr ""
+
+#: models.py:55
+msgid "Slug (last part of the url)"
+msgstr "Slug (dernière partie de l'URL)"
+
+#: views.py:85
+msgid "Your changes have been saved."
+msgstr "Vous changements ont été enregistrés"
+
+#: views.py:117
+#, python-format
+msgid "\"%s\" has been deleted."
+msgstr "« %s » a été supprimé."
+
+#: templates/audiotracks/base.html:23
+msgid "Latest tracks"
+msgstr "Derniers morceaux"
+
+#: templates/audiotracks/base.html:24
+msgid "Your tracks"
+msgstr "Vos morceaux"
+
+#: templates/audiotracks/base.html:25
+msgid "Upload track"
+msgstr "Poster un morceau"
+
+#: templates/audiotracks/confirm_delete.html:8
+#, python-format
+msgid "Are you sure you want to delete \"%(title)s\"? This can't be undone."
+msgstr "Êtes-vous certain de vouloir supprimer définitivement « %(title)s » ?"
+
+#: templates/audiotracks/confirm_delete.html:14
+msgid "Yes, delete this track"
+msgstr "Oui, supprimer définitivement ce morceau !"
+
+#: templates/audiotracks/detail.html:31
+msgid "Download Track"
+msgstr "Télécharger ce morceau"
+
+#: templates/audiotracks/detail.html:35 templates/audiotracks/latest.html:13
+#: templates/audiotracks/user_index.html:11
+msgid "Edit"
+msgstr "Éditer"
+
+#: templates/audiotracks/detail.html:36 templates/audiotracks/latest.html:14
+#: templates/audiotracks/user_index.html:12
+msgid "Delete"
+msgstr "Supprimer"
+
+#: templates/audiotracks/edit.html:11
+msgid "Edit track"
+msgstr "Édition du morceau"
+
+#: templates/audiotracks/edit.html:27
+msgid "Delete image"
+msgstr "Supprimer l'image"
+
+#: templates/audiotracks/edit.html:70
+msgid "Save your changes"
+msgstr "Enregistrer vos changements"
+
+#: templates/audiotracks/edit.html:78
+msgid "Delete this track"
+msgstr "Supprimer ce morceau"
+
+#: templates/audiotracks/new.html:9
+msgid "Upload a new track"
+msgstr "Poster un nouveau morceau"
+
+#: templates/audiotracks/new.html:12
+msgid "Upload"
+msgstr "Envoyer"
+
+#: templates/audiotracks/user_index.html:10
+#, python-format
+msgid "last modified %(last_modified)s ago"
+msgstr "modifié il y a %(last_modified)s"

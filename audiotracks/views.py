@@ -1,6 +1,7 @@
 import os
 import tempfile
 
+from django.utils.translation  import ugettext
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
@@ -81,7 +82,7 @@ def edit_track(request, track_id):
             if 'delete_image' in request.POST:
                 track.image = None
                 track.save()
-            messages.add_message(request, messages.INFO, 'Your changes have been saved.')
+            messages.add_message(request, messages.INFO, ugettext('Your changes have been saved.'))
             redirect_url = urlresolvers.reverse('user_index', args=[username])
             return HttpResponseRedirect(redirect_url)
     else:
@@ -113,5 +114,5 @@ def delete_track(request):
     track_id = request.POST.get('track_id')
     track = get_object_or_404(request.user.tracks, id=track_id)
     track.delete()
-    messages.add_message(request, messages.INFO, '"%s" has been deleted.' % track.title)
+    messages.add_message(request, messages.INFO, ugettext('"%s" has been deleted.') % track.title)
     return HttpResponseRedirect(request.POST.get('came_from', '/'))

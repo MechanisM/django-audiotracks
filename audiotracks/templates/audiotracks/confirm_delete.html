@@ -5,7 +5,7 @@
 {% if user.is_authenticated %}
 <div class="audiotracks-form">
   <p>
-  Are you sure you want to delete "{{ track.title }}"? This can't be undone.
+  {% blocktrans with track.title as title %}Are you sure you want to delete "{{ title }}"? This can't be undone.{% endblocktrans %}
   </p>
   <form method="POST" action="{% url delete_track %}">
     {% csrf_token %}

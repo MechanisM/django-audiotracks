@@ -12,58 +12,58 @@
       {{ form.non_field_errors }}
       <div class="audiotracks-edit-row">
         {{ form.audio_file.errors }}
-        <label for="id_audio_file">{{ form.audio_file.label }}:</label>
+        <label for="id_audio_file">{{ form.audio_file.label }}</label>
         {{ form.audio_file }}
         <span class="audiotracks-edit-current-data">{{ track_filename }}</span>
       </div>
       <div class="audiotracks-edit-row">
         {{ form.image.errors }}
-        <label for="id_image">{{ form.image.label }}:</label>
+        <label for="id_image">{{ form.image.label }}</label>
         {{ form.image }}
         {% if track.image %}
           <img src="{{ track.image.url_48x48 }}" alt="Track image">
           <input type="checkbox" name="delete_image" value="1"
           id="delete_image">
-          <label class="audiotracks-delete-image-label" for="delete_image">Delete image</label>
+          <label class="audiotracks-delete-image-label" for="delete_image">{% trans 'Delete image' %}</label>
         {% endif %}
       </div>
       <div class="audiotracks-edit-row">
         <div>
           {{ form.title.errors }}
-          <label for="id_title">{{ form.title.label }}:</label>
+          <label for="id_title">{{ form.title.label }}</label>
           {{ form.title }}
         </div>
         <div>
           {{ form.artist.errors }}
-          <label for="id_artist">{{ form.artist.label }}:</label>
+          <label for="id_artist">{{ form.artist.label }}</label>
           {{ form.artist }}
         </div>
       </div>
       <div class="audiotracks-edit-row">
         <div>
           {{ form.genre.errors }}
-          <label for="id_genre">{{ form.genre.label }}:</label>
+          <label for="id_genre">{{ form.genre.label }}</label>
           {{ form.genre }}
         </div>
         <div>
           {{ form.date.errors }}
-          <label for="id_date">{{ form.date.label }}:</label>
+          <label for="id_date">{{ form.date.label }}</label>
           {{ form.date }}
         </div>
       </div>
       <div class="audiotracks-edit-row">
         {{ form.tags.errors }}
-        <label for="id_tags">{{ form.tags.label }}:</label>
+        <label for="id_tags">{{ form.tags.label }}</label>
         {{ form.tags }}
       </div>
       <div class="audiotracks-edit-row">
         {{ form.description.errors }}
-        <label for="id_description">{{ form.description.label }}:</label>
+        <label for="id_description">{{ form.description.label }}</label>
         {{ form.description }}
       </div>
       <div class="audiotracks-edit-row">
         {{ form.slug.errors }}
-        <label for="id_slug">URL:</label>
+        <label for="id_slug">{{ form.slug.label }}</label>
         <span class="audiotracks-edit-current-data">{{ track_url_prefix }}</span>{{ form.slug }}
       </div>
       <p>
@@ -74,7 +74,9 @@
 </div>
 <div class="audiotracks-form">
   <form action="{% url confirm_delete_track track.id %}">
-    <button>Delete this track</button>
+    <p>
+    <button>{% trans 'Delete this track' %}</button>
+    </p>
   </form>
 </div>
 {% endif %}

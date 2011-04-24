@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.utils.translation  import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
@@ -42,16 +43,16 @@ class Track(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    audio_file = models.FileField(upload_to=get_audio_upload_path)
-    image = ImageWithThumbsField(upload_to=get_images_upload_path, null=True,
+    audio_file = models.FileField(_("Audio file"), upload_to=get_audio_upload_path)
+    image = ImageWithThumbsField(_("Image"), upload_to=get_images_upload_path, null=True,
             blank=True, sizes=((48,48), (200,200)))
-    title = models.CharField(max_length="200", null=True)
-    artist = models.CharField(max_length="200", null=True, blank=True)
-    genre = models.CharField(max_length="200", null=True, blank=True)
-    date = models.CharField(max_length="200", null=True, blank=True)
-    tags = TagField()
-    description = models.TextField(null=True, blank=True)
-    slug = models.SlugField(verbose_name="Slug (last part of the url)")
+    title = models.CharField(_("Title"), max_length="200", null=True)
+    artist = models.CharField(_("Artist"), max_length="200", null=True, blank=True)
+    genre = models.CharField(_("Genre"), max_length="200", null=True, blank=True)
+    date = models.CharField(_("Date"), max_length="200", null=True, blank=True)
+    tags = TagField(_("Tags"))
+    description = models.TextField(_("Description"), null=True, blank=True)
+    slug = models.SlugField(verbose_name=_("Slug (last part of the url)"))
     _original_slug = None # Used to detect slug change
 
     def __init__(self, *args, **kwargs):

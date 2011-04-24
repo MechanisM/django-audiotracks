@@ -7,7 +7,7 @@
 {% for track in tracks %}
 <li>
 <a href="{% url track_detail username,track.slug %}">{{ track.title }}</a>
-last modified {{ track.updated_at|date:"l d M Y G:i" }}
+{% blocktrans with track.updated_at|timesince as last_modified %}last modified {{ last_modified }} ago{% endblocktrans %}
   <a href="{% url edit_track track.id %}">[{% trans 'Edit' %}]</a>
   <a href="{% url confirm_delete_track track.id %}">[{% trans 'Delete' %}]</a>
 </li>
