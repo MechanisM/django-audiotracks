@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-24 13:46+0700\n"
+"POT-Creation-Date: 2011-04-24 21:52+0700\n"
 "PO-Revision-Date: 2011-04-24 13:37+007\n"
 "Last-Translator: Alex Marandon <contact@alexmarandon.com>\n"
 "Language-Team: Alex Marandon <contact@alexmarandon.com>\n"
@@ -113,6 +113,10 @@ msgstr "Enregistrer vos changements"
 msgid "Delete this track"
 msgstr "Supprimer ce morceau"
 
+#: templates/audiotracks/latest.html:5
+msgid "Latest Tracks"
+msgstr "Derniers Morceaux"
+
 #: templates/audiotracks/new.html:9
 msgid "Upload a new track"
 msgstr "Poster un nouveau morceau"
@@ -120,6 +124,10 @@ msgstr "Poster un nouveau morceau"
 #: templates/audiotracks/new.html:12
 msgid "Upload"
 msgstr "Envoyer"
+
+#: templates/audiotracks/user_index.html:5
+msgid "Your Tracks"
+msgstr "Vos morceaux"
 
 #: templates/audiotracks/user_index.html:10
 #, python-format
