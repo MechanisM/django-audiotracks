@@ -13,6 +13,7 @@ class TrackEditForm(forms.ModelForm):
     class Meta:
         model = Track
         exclude = ('user', 'created_at', 'updated_at')
+        widgets = {'audio_file': forms.FileInput, 'image': forms.FileInput}
 
     def clean_slug(self):
         new_slug = self.cleaned_data['slug']
