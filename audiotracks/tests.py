@@ -147,7 +147,7 @@ class TestViews(TestCase):
     def test_latest(self):
         "Get latest tracks"
         self.do_upload('ogg')
-        resp = self.client.get('/al/music')
+        resp = self.client.get('/bob/music')
         # Check that slug is in listing content
         assert 'django-audiotracks-test-file' in resp.content
 

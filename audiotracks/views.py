@@ -22,7 +22,10 @@ from audiotracks.forms import TrackUploadForm, TrackEditForm
 METADATA_FIELDS = ('title', 'artist', 'genre', 'description', 'date')
 
 def index(request, username=None):
-    tracks = Track.objects.order_by('-created_at').all()
+    tracks = Track.objects
+    if username:
+        tracks = tracks.filter(user__username=username)
+    tracks = tracks.order_by('-created_at').all()
     return render_to_response("audiotracks/latest.html", {'username': username, 
         'tracks': tracks}, context_instance=RequestContext(request))
 
@@ -56,6 +59,7 @@ def upload_track(request):
                 if metadata and metadata.get(field):
                     setattr(track, field, metadata.get(field)[0])
             track.save()
+
             return HttpResponseRedirect(urlresolvers.reverse('edit_track',
                 args=[track.id]))
     else:
