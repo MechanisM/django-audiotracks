@@ -32,7 +32,10 @@ class AllTracks(Feed):
         return Track.objects.order_by('-created_at')[:ITEMS_PER_FEED]
 
     def item_title(self, item):
-        return _('"%s" posted by %s') % (item.title, item.user.username)
+        return _('"%(title)s" posted by %(username)s') % {
+                'title': item.title,
+                'username': item.user.username
+                }
 
     def item_description(self, item):
         if item.image:
@@ -70,11 +73,16 @@ class UserTracks(AllTracks):
         return self.request.build_absolute_uri("/%s/" % user.username)
 
     def title(self, user):
-        return _("Podcast by %s on %s") % (user.username, self._get_site_name())
+        return _("Podcast by %(username)s on %(site_name)s") % {
+                'username': user.username, 
+                'site_name': self._get_site_name()
+        }
 
     def description(self, user):
-        return _("Audio tracks posted on %s by %s" % (self._get_site_name(),
-            user.username))
+        return _("Audio tracks posted on %(site_name)s by %(username)s" % {
+            'site_name': self._get_site_name(),
+            'username': user.username
+            })
 
     def items(self, user):
         return Track.objects.filter(user=user).order_by("-created_at")[:ITEMS_PER_FEED]
