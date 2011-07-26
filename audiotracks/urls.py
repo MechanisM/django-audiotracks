@@ -10,7 +10,5 @@ urlpatterns = patterns("audiotracks.views",
         name="confirm_delete_track"),
     url("^/delete$", "delete_track", name="delete_track"),
     url("^/tracks$", "user_index", name="user_index"),
-    url("^/feed/?$", feeds.AllTracks(), name="all_tracks_feed"),
-    url("^/user_feed/?$", feeds.UserTracks(),
-        name="user_tracks_feed"),
+    url("^/feed/?$", feeds.choose_feed, name="tracks_feed"),
 )
