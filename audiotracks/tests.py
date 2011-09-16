@@ -31,10 +31,14 @@ class TestViews(TestCase):
         if os.path.exists(settings.MEDIA_ROOT):
             shutil.rmtree(settings.MEDIA_ROOT)
 
-    def do_upload(self, ext):
+    def get_upload_file(self, ext):
         filename = "audio_file." + ext
         filepath = os.path.join(TEST_DATA_DIR, filename)
         filehandle = open(filepath)
+        return filename, filehandle
+
+    def do_upload(self, ext):
+        filename, filehandle = self.get_upload_file(ext)
         resp = self.client.post('/music/upload', {
             'name': filename,
             'audio_file': filehandle
@@ -85,8 +89,8 @@ class TestViews(TestCase):
         assert 'wav' in track.audio_file.name
         self.assertEquals(track.slug, "audio_file")
 
-    def test_edit(self, ext='ogg'):
-        "Edit track"
+    def test_edit_track_attributes(self, ext='ogg'):
+        "Edit track attributes and verify that they get saved into the audiofile itself"
         self.do_upload(ext)
         track = Track.objects.get(genre="Test Data")
         self.do_edit(track, slug='new-title')
@@ -100,11 +104,11 @@ class TestViews(TestCase):
 
     def test_edit_mp3(self):
         "Edit MP3 track"
-        self.test_edit('mp3')
+        self.test_edit_track_attributes('mp3')
 
     def test_edit_flac(self):
         "Edit FLAC track"
-        self.test_edit('flac')
+        self.test_edit_track_attributes('flac')
 
     def test_edit_wav(self):
         "Edit WAV track"
@@ -115,6 +119,26 @@ class TestViews(TestCase):
         track = Track.objects.get(genre="New Genre")
         self.assertEquals(track.title, 'New Title')
 
+    def test_replace_track_file(self):
+        "Update audio file for a track"
+
+        # Upload mp3
+        self.do_upload('mp3')
+
+        # Update track with ogg file
+        track_id = Track.objects.get(genre="Test Data").id
+        filename, filehandle = self.get_upload_file('ogg')
+        resp = self.client.post('/music/edit/%s' % track_id, {
+            'name': filename,
+            'audio_file': filehandle,
+            'title': "New Title",
+            'genre': "New Genre",
+            'slug': "new-slug",
+            })
+
+        # Check that the file has been replaced
+        track = Track.objects.get(id=track_id)
+        self.assert_(track.audio_file.path.endswith('.ogg'))
 
     def test_delete_image(self):
         "Attach and remove track image"

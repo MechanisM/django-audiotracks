@@ -68,13 +68,22 @@ def upload_track(request):
             context_instance=RequestContext(request))
 
 @login_required
+@csrf_exempt # request.POST is accessed by CsrfViewMiddleware
 def edit_track(request, track_id):
+    # Disable in memory upload before accessing POST 
+    # because we need a file from which to read metadata
+    request.upload_handlers = [TemporaryFileUploadHandler()] 
     username = request.user.username
     track = request.user.tracks.get(id=track_id)
     if request.method == "POST":
         form = TrackEditForm(request.POST, request.FILES, instance=track)
         if form.is_valid():
-            metadata = mutagen.File(track.audio_file.path, easy=True)
+            if 'audio_file' in request.FILES:
+                audio_file = request.FILES['audio_file']
+                audio_file_path = audio_file.temporary_file_path()
+            else:
+                audio_file_path = track.audio_file.path
+            metadata = mutagen.File(audio_file_path, easy=True)
             if metadata:
                 for field in METADATA_FIELDS:
                     try:
