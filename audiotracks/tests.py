@@ -56,6 +56,7 @@ class TestViews(TestCase):
         track = Track.objects.get(genre="Test Data")
         self.assertEquals(track.title, "django-audiotracks test file")
         self.assertEquals(track.slug, "django-audiotracks-test-file")
+        return track
 
     def do_edit(self, track, **params):
         default_params = {
@@ -69,17 +70,20 @@ class TestViews(TestCase):
     def test_upload_ogg(self):
         "OGG file upload"
         self.do_upload('ogg')
-        self.verify_upload()
+        track = self.verify_upload()
+        self.assertEquals(track.mimetype, "audio/ogg")
 
     def test_upload_flac(self):
         "Flac file upload"
         self.do_upload('flac')
-        self.verify_upload()
+        track = self.verify_upload()
+        self.assertEquals(track.mimetype, "audio/flac")
 
     def test_upload_mp3(self):
         "MP3 file upload"
         self.do_upload('mp3')
-        self.verify_upload()
+        track = self.verify_upload()
+        self.assertEquals(track.mimetype, "audio/mpeg")
 
     def test_upload_wav(self):
         "WAV file upload"
@@ -88,6 +92,7 @@ class TestViews(TestCase):
         track = Track.objects.get(id=1)
         assert 'wav' in track.audio_file.name
         self.assertEquals(track.slug, "audio_file")
+        self.assertEquals(track.mimetype, "audio/x-wav")
 
     def test_edit_track_attributes(self, ext='ogg'):
         "Edit track attributes and verify that they get saved into the audiofile itself"

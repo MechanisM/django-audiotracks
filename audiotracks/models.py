@@ -1,8 +1,7 @@
 import os
+import mimetypes
 
-from django.conf import settings
 from django.utils.translation  import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
@@ -70,6 +69,9 @@ class Track(models.Model):
             self.slug = slugify_uniquely(slug_source, self)
         super(Track, self).save(**kwargs)
 
+    @property
+    def mimetype(self):
+        return mimetypes.guess_type(self.audio_file.path)[0]
 
     @models.permalink
     def get_absolute_url(self):
