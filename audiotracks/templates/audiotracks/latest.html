@@ -10,8 +10,7 @@
 uploaded by {{ track.user.username }}
 on {{ track.created_at|date:"l d M Y" }}
 {% if track.user == request.user %}
-  <a href="{% url edit_track track.id %}">[{% trans 'Edit' %}]</a>
-  <a href="{% url confirm_delete_track track.id %}">[{% trans 'Delete' %}]</a>
+    {% include 'audiotracks/_list_actions.html' %}
 {% endif %}
 </li>
 {% endfor %}

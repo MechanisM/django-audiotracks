@@ -6,10 +6,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-     (r'^$', 'main.views.index'),
+    url(r'^$', 'main.views.index', name="home"),
     url("^music", include("audiotracks.urls")),
     url("^(?P<username>[\w\._-]+)/music", include("audiotracks.urls")),
-    (r'^login$', 'django.contrib.auth.views.login'),
+    url(r'^login$', 'django.contrib.auth.views.login', name="login"),
+    url(r'^logout$', 'django.contrib.auth.views.logout', name="logout"),
     (r'^admin/', include(admin.site.urls)),
 )
 

@@ -8,8 +8,7 @@
 <li>
 <a href="{% url track_detail username,track.slug %}">{{ track.title }}</a>
 {% blocktrans with track.updated_at|timesince as last_modified %}last modified {{ last_modified }} ago{% endblocktrans %}
-  <a href="{% url edit_track track.id %}">[{% trans 'Edit' %}]</a>
-  <a href="{% url confirm_delete_track track.id %}">[{% trans 'Delete' %}]</a>
+    {% include 'audiotracks/_list_actions.html' %}
 </li>
 {% endfor %}
 </ul>

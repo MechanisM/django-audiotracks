@@ -3,15 +3,16 @@
 
 {% block body %}
 {% if user.is_authenticated %}
-<form method="POST" enctype="multipart/form-data" action="{% url upload_track %}">
+<form class="audiotracks-form" id="audiotracks-upload-form" 
+      method="POST" enctype="multipart/form-data" action="{% url upload_track %}">
   {% csrf_token %}
   <fieldset>
     <legend>{% trans 'Upload a new track' %}</legend>
     {{ form.as_p }}
-    <p>
-    <input type="submit" value="{% trans 'Upload' %}" />
-    </p>
   </fieldset>
+  <p>
+  <button class="btn primary">{% trans 'Upload' %}</button>
+  </p>
 </form>
 {% endif %}
 {% endblock %}
