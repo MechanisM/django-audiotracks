@@ -6,9 +6,9 @@
 <ul class="audiotracks-list">
 {% for track in tracks %}
 <li>
+    {% include 'audiotracks/_list_actions.html' %}
 <a href="{% url track_detail username,track.slug %}">{{ track.title }}</a>
 {% blocktrans with track.updated_at|timesince as last_modified %}last modified {{ last_modified }} ago{% endblocktrans %}
-    {% include 'audiotracks/_list_actions.html' %}
 </li>
 {% endfor %}
 </ul>
