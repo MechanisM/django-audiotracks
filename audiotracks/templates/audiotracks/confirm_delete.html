@@ -11,7 +11,7 @@
     {% csrf_token %}
     <input type="hidden" name="track_id" value="{{ track.id }}">
     <input type="hidden" name="came_from" value="{{ came_from }}">
-    <button>{% trans 'Yes, delete this track' %}</button>
+    <button class="btn btn-danger">{% trans 'Yes, delete this track' %}</button>
   </form>
 </div>
 {% endif %}

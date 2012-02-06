@@ -28,12 +28,12 @@
     {{ track.description }}
   </div>
   <div class="audiotracks-download">
-    <a href="{{ track.audio_file.url }}">{% trans 'Download Track' %}</a>
+    <a class="btn btn-large btn-success" href="{{ track.audio_file.url }}">{% trans 'Download Track' %}</a>
   </div>
 {% if track.user == request.user %}
 <p>
-  <a href="{% url edit_track track.id %}">[{% trans 'Edit' %}]</a>
-  <a href="{% url confirm_delete_track track.id %}">[{% trans 'Delete' %}]</a>
+  <a class="btn btn-primary" href="{% url edit_track track.id %}">{% trans 'Edit' %}</a>
+  <a class="btn btn-danger" href="{% url confirm_delete_track track.id %}">{% trans 'Delete' %}</a>
 </p>
 {% endif %}
 </div>

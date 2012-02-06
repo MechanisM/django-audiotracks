@@ -28,24 +28,24 @@
         {% endif %}
       </div>
       <div class="audiotracks-edit-row">
-        <div>
+        <div class="audiotracks-edit-half-row">
           {{ form.title.errors }}
           <label for="id_title">{{ form.title.label }}</label>
           {{ form.title }}
         </div>
-        <div>
+        <div class="audiotracks-edit-half-row">
           {{ form.artist.errors }}
           <label for="id_artist">{{ form.artist.label }}</label>
           {{ form.artist }}
         </div>
       </div>
       <div class="audiotracks-edit-row">
-        <div>
+        <div class="audiotracks-edit-half-row">
           {{ form.genre.errors }}
           <label for="id_genre">{{ form.genre.label }}</label>
           {{ form.genre }}
         </div>
-        <div>
+        <div class="audiotracks-edit-half-row">
           {{ form.date.errors }}
           <label for="id_date">{{ form.date.label }}</label>
           {{ form.date }}
@@ -64,10 +64,12 @@
       <div id="slug" class="audiotracks-edit-row">
         {{ form.slug.errors }}
         <label for="id_slug">{{ form.slug.label }}</label>
-        <span class="audiotracks-edit-current-data">{{ track_url_prefix }}</span>{{ form.slug }}
+        <div class="input-prepend">
+          <span class="audiotracks-edit-current-data add-on">{{ track_url_prefix }}</span>{{ form.slug }}
+        </div>
       </div>
       <p id="save-button">
-      <button class="btn primary">{% trans 'Save your changes' %}</button>
+      <button class="btn btn-primary">{% trans 'Save your changes' %}</button>
       </p>
     </fieldset>
   </form>
@@ -75,7 +77,7 @@
 <div class="audiotracks-form" id="delete-form">
   <form action="{% url confirm_delete_track track.id %}">
     <p id="delete-button">
-    <button class="btn danger">{% trans 'Delete this track' %}</button>
+    <button class="btn btn-danger">{% trans 'Delete this track' %}</button>
     </p>
   </form>
 </div>
