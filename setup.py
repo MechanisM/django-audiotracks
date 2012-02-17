@@ -22,7 +22,6 @@ setup(
     ],
     install_requires = [
         'mutagen==1.20',
-        'django-tagging',
         'PIL'
         ],
     include_package_data=True,

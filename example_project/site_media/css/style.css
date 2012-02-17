@@ -105,6 +105,6 @@ ul.audiotracks-list li {
   float: none; 
   text-align: left; 
 }
-#id_tags, #id_description { width: 630px; }
+#id_description { width: 630px; }
 .btn.small { padding: 2px; }
 .audiotracks-download { margin: 16px 0; }

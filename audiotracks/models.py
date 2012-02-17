@@ -1,12 +1,13 @@
 import os
 import mimetypes
 
-from django.utils.translation  import ugettext_lazy as _
-from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import models
 from django.template.defaultfilters import slugify
+from django.utils.translation  import ugettext_lazy as _
+
 from thumbs import ImageWithThumbsField
-from tagging.fields import TagField
 
 def slugify_uniquely(value, obj, slugfield="slug"): 
     suffix = 1
@@ -34,7 +35,11 @@ def get_audio_upload_path(obj, filename):
     return get_upload_path("audio_files", obj, filename)
 
 
-class Track(models.Model):
+class AbstractTrack(models.Model):
+
+    class Meta:
+        abstract = True
+
     user = models.ForeignKey(User,
         related_name = "tracks",
         blank = True,
@@ -49,13 +54,12 @@ class Track(models.Model):
     artist = models.CharField(_("Artist"), max_length="200", null=True, blank=True)
     genre = models.CharField(_("Genre"), max_length="200", null=True, blank=True)
     date = models.CharField(_("Date"), max_length="200", null=True, blank=True)
-    tags = TagField(_("Tags"))
     description = models.TextField(_("Description"), null=True, blank=True)
     slug = models.SlugField(verbose_name=_("Slug (last part of the url)"))
     _original_slug = None # Used to detect slug change
 
     def __init__(self, *args, **kwargs):
-        super(Track, self).__init__(*args, **kwargs)
+        super(AbstractTrack, self).__init__(*args, **kwargs)
         self._original_slug = self.slug
 
     def __unicode__(self):
@@ -67,7 +71,7 @@ class Track(models.Model):
             slug_source = getattr(self, 'title') or \
                     os.path.splitext(os.path.basename(self.audio_file.name))[0]
             self.slug = slugify_uniquely(slug_source, self)
-        super(Track, self).save(**kwargs)
+        super(AbstractTrack, self).save(**kwargs)
 
     @property
     def mimetype(self):
@@ -76,3 +80,10 @@ class Track(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('audiotracks.views.track_detail', [self.user.username, self.slug])
+
+if hasattr(settings, 'AUDIOTRACKS_MODEL'):
+    app_name, model_name = settings.AUDIOTRACKS_MODEL.split('.')
+    Track = models.get_model(app_name, model_name)
+else:
+    class Track(AbstractTrack):
+        pass

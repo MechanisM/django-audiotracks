@@ -3,9 +3,9 @@ from os.path import dirname, abspath
 import shutil
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
 import mutagen
 
 from audiotracks.models import Track
@@ -14,10 +14,6 @@ TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))), 'tests', 'data
 
 
 class TestViews(TestCase):
-    """
-    Mixin class which contains methods used by both single user mode and multi
-    user mode.
-    """
 
     urls = 'urls'
 
@@ -215,5 +211,3 @@ class TestViews(TestCase):
         self.do_edit(new_alice_track, slug='django-audiotracks-test-file')
         _, existing_alice_track, new_alice_track = Track.objects.all()
         self.assertEquals(new_alice_track.slug, 'django-audiotracks-test-file-2')
-
-

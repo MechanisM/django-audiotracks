@@ -1,3 +1,1 @@
 - show type and size for each track
-- i18n + french l10n
-- save metadata edited through the app into audio files
