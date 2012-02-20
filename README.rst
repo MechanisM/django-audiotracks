@@ -11,8 +11,7 @@ django-audiotracks is a simple Django_ app that allows your users to publish
 audio tracks in various formats (Ogg Vorbis, Flac, MP3, WAV). It ships with a
 default ``Track`` model, a set of views, default templates, podcast feeds and
 sensible default URL configuration.  It uses mutagen_ to extract metadata from
-audio files.  PIL is required to process the image that can be attached to each
-track.  
+audio files.  PIL is required to process images that can be attached to tracks.  
 
 
 Installation
@@ -132,9 +131,10 @@ Podcast feeds
 _____________
 
 * View function ``feeds.choose_feed``
+* Default URL: <app_mount_point>/feed or <app_mount_point_containing_username>/feed
 
-Pick up the user feed or the global feed depending on whether or not the URL
-contains a ``username`` parameter
+Choose user feed or global feed depending on whether or not URL contains a
+``username`` parameter
 
 
 Configuration
@@ -143,14 +143,19 @@ Configuration
 AUDIOTRACKS_MODEL
 _________________
 
-iDefault: ``audiotracks.Track`` (string)
+Default: ``audiotracks.Track`` (string)
 
-If the default ``Track`` model doesn't satisfy your needs, you can define your own track model that inherits from ``audiotracks.models.AbstractTrack``. For instance if you wish to add tagging you might define a model like this::
+If the default ``Track`` model doesn't satisfy your needs, you can define your
+own track model that inherits from ``audiotracks.models.AbstractTrack``. For
+instance if you wish to add tagging you might define a model like this::
 
    class MyTrack(AbstractTrack):
        tags = TagField(_("Tags"))
 
-Use the ``AUDIOTRACKS_MODEL`` setting to tell django-audiotracks about your model, using the convention ``<app_name>.<model_class_name>``. So if your model is called ``MyTrack`` and is located withing the app ``myapp``, you use this setting::
+Use the ``AUDIOTRACKS_MODEL`` setting to tell django-audiotracks about your
+model, using the convention ``<app_name>.<model_class_name>``. So if your model
+is called ``MyTrack`` and is located withing the app ``myapp``, use this
+setting::
 
     AUDIOTRACKS_MODEL = 'myapp.MyTrack'
 
@@ -159,7 +164,6 @@ AUDIOTRACKS_PODCAST_LIMIT
 _________________________
 
 Default: ``10`` (integer)
-
 
 Use this setting to specify how many tracks podcast feeds should contain.
 
