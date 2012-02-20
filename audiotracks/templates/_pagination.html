@@ -1,3 +1,4 @@
+{% if page.paginator.num_pages > 1 %}
 <div class="pagination">
   <ul>
     {% if page.has_previous %}
@@ -19,3 +20,4 @@
     {% endif %}
   </ul>
 </div>
+{% endif %}
