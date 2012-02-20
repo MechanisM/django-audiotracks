@@ -10,7 +10,8 @@ import mutagen
 
 from audiotracks.models import Track
 
-TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))), 'tests', 'data')
+TEST_DATA_DIR = os.path.join(dirname(dirname(abspath(__file__))),
+                             'tests', 'data')
 
 
 class TestViews(TestCase):
@@ -45,7 +46,7 @@ class TestViews(TestCase):
         response = self.client.login(username=username, password='secret')
         self.do_upload('ogg')
         self.assert_(os.path.exists(os.path.join(settings.MEDIA_ROOT,
-            "audiotracks", "audio_files", username, "audio_file.ogg")), 
+            "audiotracks", "audio_files", username, "audio_file.ogg")),
             "Upload path should contain username")
 
     def verify_upload(self):
@@ -91,7 +92,10 @@ class TestViews(TestCase):
         self.assertEquals(track.mimetype, "audio/x-wav")
 
     def test_edit_track_attributes(self, ext='ogg'):
-        "Edit track attributes and verify that they get saved into the audiofile itself"
+        """
+        Edit track attributes and verify that they get saved into the audiofile
+        itself
+        """
         self.do_upload(ext)
         track = Track.objects.get(genre="Test Data")
         self.do_edit(track, slug='new-title')
@@ -170,11 +174,46 @@ class TestViews(TestCase):
         self.assertEquals(Track.objects.count(), 0)
 
     def test_latest(self):
-        "Get latest tracks"
-        self.do_upload('ogg')
-        resp = self.client.get('/bob/music')
-        # Check that slug is in listing content
-        assert 'django-audiotracks-test-file' in resp.content
+        # Create 7 tracks
+        for n in range(1, 8):
+            self.do_upload('ogg')
+            track = Track.objects.get(title="django-audiotracks test file")
+            track.title = "Track %s" % n
+            track.save()
+
+        # Get latest tracks
+        resp = self.client.get('/bob/music/1')
+        assert 'Track 7' in resp.content
+        assert 'Track 5' in resp.content
+        assert 'Track 4' not in resp.content
+
+        # Get oldest tracks
+        resp = self.client.get('/bob/music/3')
+        assert 'Track 1' in resp.content
+        assert 'Track 2' not in resp.content
+
+    def test_user_latest(self):
+        # Create 4 tracks for each user
+        for name in ('bob', 'alice'):
+            self.client.login(username=name, password='secret')
+            for n in range(1, 5):
+                self.do_upload('ogg')
+                track = Track.objects.get(title="django-audiotracks test file")
+                track.title = "%s Track %s" % (name.capitalize(), n)
+                track.save()
+
+        # Get latest tracks from bob
+        self.client.login(username='bob', password='secret')
+        resp = self.client.get('/bob/music/tracks/1')
+        assert 'Bob Track 4' in resp.content
+        assert 'Bob Track 2' in resp.content
+        assert 'Bob Track 1' not in resp.content
+
+        # Get oldest tracks alice
+        self.client.login(username='alice', password='secret')
+        resp = self.client.get('/alice/music/tracks/2')
+        assert 'Alice Track 1' in resp.content
+        assert 'Alice Track 2' not in resp.content
 
     def test_get_track(self):
         "Get track"
@@ -201,13 +240,14 @@ class TestViews(TestCase):
         # We should be allowed to set the same slug for 2 tracks belonging to 2
         # different users
         self.do_edit(alice_track, slug='django-audiotracks-test-file')
-        _, alice_track  = Track.objects.all()
+        _, alice_track = Track.objects.all()
         self.assertEquals(alice_track.slug, 'django-audiotracks-test-file')
-        
+
         # We should not be able to set the same slug for 2 tracks belonging to
         # the same user
         self.do_upload_as_user('alice')
         _, existing_alice_track, new_alice_track = Track.objects.all()
         self.do_edit(new_alice_track, slug='django-audiotracks-test-file')
         _, existing_alice_track, new_alice_track = Track.objects.all()
-        self.assertEquals(new_alice_track.slug, 'django-audiotracks-test-file-2')
+        self.assertEquals(new_alice_track.slug,
+                          'django-audiotracks-test-file-2')

@@ -13,3 +13,5 @@ INSTALLED_APPS = (
     "django.contrib.sites",
     "audiotracks",
 )
+
+AUDIOTRACKS_PER_PAGE = 3

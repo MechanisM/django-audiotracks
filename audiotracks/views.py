@@ -2,7 +2,9 @@ import os
 
 from django.utils.translation  import ugettext
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core import urlresolvers
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render_to_response
@@ -19,20 +21,47 @@ from audiotracks.forms import TrackUploadForm, TrackEditForm
 METADATA_FIELDS = ('title', 'artist', 'genre', 'description', 'date')
 
 
-def index(request, username=None):
+def paginate(tracks, page_number):
+    per_page = getattr(settings, 'AUDIOTRACKS_PER_PAGE', 10)
+    paginator = Paginator(tracks, per_page)
+
+    if page_number is None:
+        page = paginator.page(1)
+    else:
+        try:
+            page = paginator.page(int(page_number))
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            page = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of
+            # results.
+            page = paginator.page(paginator.num_pages)
+    return page, page.object_list
+
+
+def index(request, username=None, page_number=None):
     tracks = Track.objects
     if username:
         tracks = tracks.filter(user__username=username)
     tracks = tracks.order_by('-created_at').all()
-    return render_to_response("audiotracks/latest.html", {'username': username,
-        'tracks': tracks}, context_instance=RequestContext(request))
+    page, tracks = paginate(tracks, page_number)
+    base_path = urlresolvers.reverse('audiotracks',
+                    args=[username] if username is not None else [])
+    return render_to_response("audiotracks/latest.html", {
+        'username': username, 'tracks': tracks, 'page': page,
+        'base_path': base_path,
+        }, context_instance=RequestContext(request))
 
 
-def user_index(request, username):
-    tracks = request.user.tracks.all()
-    return render_to_response("audiotracks/user_index.html",
-            {'username': username, 'tracks': tracks},
-            context_instance=RequestContext(request))
+def user_index(request, username, page_number=None):
+    tracks = request.user.tracks.order_by('-created_at').all()
+    page, tracks = paginate(tracks, page_number)
+    base_path = urlresolvers.reverse('user_index', args=[username])
+    return render_to_response("audiotracks/user_index.html", {
+        'username': username, 'tracks': tracks, 'page': page,
+        'base_path': base_path,
+        }, context_instance=RequestContext(request))
 
 
 def track_detail(request, track_slug, username=None):

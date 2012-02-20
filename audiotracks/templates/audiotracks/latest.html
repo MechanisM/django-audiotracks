@@ -15,4 +15,7 @@ on {{ track.created_at|date:"l d M Y" }}
 </li>
 {% endfor %}
 </ul>
+
+{% include '_pagination.html' %}
+
 {% endblock %}
