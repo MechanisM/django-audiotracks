@@ -1,1 +1,3 @@
-- show type and size for each track
+- display file type and size for each track
+- m3u playlists for listings
+- upload progress bar
