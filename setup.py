@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
  
 setup(
     name='django-audiotracks',
-    version='0.1.0',
+    version='0.1',
     description='A pluggable Django app to publish audio tracks',
     long_description=open("README.rst").read(),
-    keywords='django,audio',
+    keywords='django audio sound',
     author='Alex Marandon',
     license='MIT',
     author_email='contact@alexmarandon.com',
@@ -15,7 +15,7 @@ setup(
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Framework :: Django',

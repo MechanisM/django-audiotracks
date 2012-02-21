@@ -17,15 +17,37 @@ audio files.  PIL is required to process images that can be attached to tracks.
 Installation
 ~~~~~~~~~~~~
 
-Install the ``audiotracks`` package in your Python path. A ``setup.py`` script is provided. You
+
+Using PyPi
+__________
+
+You can install django-audiotracks from PyPI using pip::
+
+    $ pip install django-audiotracks
+
+
+From GitHub
+___________
+
+Clone the repository with::
+
+    $ git clone git://github.com/alex-marandon/django-audiotracks.git
+
+Then install the ``audiotracks`` package in your Python path. A ``setup.py`` script is provided. You
 can use it with a command such as::
 
+    $ cd django-audiotracks
     $ python setup.py install
+
+Or if you wish to modify the code::
+
+    $ python setup.py develop
 
 Run the example project
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-A minimal sample project is provided with the source code::
+If you get django-audiotracks from GitHub, an example project styled with
+Twitter Bootstrap is provided with the source code. You can run it like this::
 
     $ cd <django-audiotracks_source_dir>/example_project/
     $ python manage.py syncdb      # Create initial user at this stage

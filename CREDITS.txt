@@ -1,0 +1,11 @@
+Author: Alex Marandon <contact@alexmarandon.com>
+
+
+Includes django-thumbs by Antonio Melé:
+
+    http://djangothumbnails.com/
+
+
+Example project inludes Twitter Bootstrap:
+
+    http://twitter.github.com/bootstrap/

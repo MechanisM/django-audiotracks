@@ -1,0 +1,10 @@
+include README.rst
+include LICENSE.txt
+include TODO.txt
+recursive-include audiotracks/templates *
+recursive-include audiotracks/locale *
+exclude audiotracks/tests.py
+recursive-exclude tests *
+recursive-exclude example_project *
+recursive-exclude * *.pyc
+
